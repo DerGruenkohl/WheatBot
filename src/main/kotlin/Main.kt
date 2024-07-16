@@ -8,13 +8,10 @@ import listeners.CommandManager
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.hypixel.api.HypixelAPI
-import net.hypixel.api.reactor.ReactorHttpClient
-import java.util.*
+
 
 lateinit var jda: JDA
-val hypixelAPI = HypixelAPI(ReactorHttpClient(UUID.fromString(apikey)))
-const val test = true
+const val test = false
 fun main() {
     startup()
 }

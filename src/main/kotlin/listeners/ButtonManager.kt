@@ -1,9 +1,7 @@
 package listeners
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import utils.dsl.runAsync
 
 class ButtonManager: ListenerAdapter() {

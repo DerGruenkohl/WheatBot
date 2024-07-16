@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import utils.getMinecraftUUID
 import utils.getMinecraftUsername
 import utils.getPairsInRange
-import kotlin.jvm.Throws
 
 class Leaderboard {
     @Throws(Exception::class)
