@@ -30,12 +30,7 @@ class CommandManager : ListenerAdapter() {
         }
     }
 
-    fun add(command: ICommand) {
-        commands.add(command)
-    }
-    fun add(commands: List<ICommand>){
-        commands.forEach {
-            add(it)
-        }
+    fun add(vararg command: ICommand) {
+        commands.addAll(command)
     }
 }

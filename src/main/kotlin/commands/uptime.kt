@@ -1,6 +1,8 @@
 package commands
 
 import api.LocalAPI
+import apiUrl
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
@@ -10,7 +12,9 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import share.Link
 import share.Member
+import utils.getMinecraftUsername
 import kotlin.math.floor
 
 class Uptime: ICommand {
@@ -19,18 +23,29 @@ class Uptime: ICommand {
     override val options: List<OptionData>
         get() {
             val options = ArrayList<OptionData>()
-            options.add(OptionData(OptionType.STRING, "ign", "The ign").setRequired(true))
+            options.add(OptionData(OptionType.STRING, "ign", "The ign"))
             return options
         }
     override fun execute(event: SlashCommandInteractionEvent) {
-        val ign = event.getOption("ign")!!.asString
-
+        val option = event.getOption("ign")
+        var ign: String? = null
         val hook = event.deferReply().complete()
         try {
             val api = LocalAPI()
             val client = api.client
             runBlocking {
-                val body = client.request("http://raspi:8080/api/uptime/player/$ign").bodyAsText()
+                if(option != null) {
+                    ign = option.asString
+                }
+                if(ign == null) {
+                    val response = client.request("link/${event.user.id}")
+                    if (response.status.value >= 300){
+                        hook.editOriginal("No Ign applied and no account linked!").queue()
+                        return@runBlocking
+                    }
+                    ign = getMinecraftUsername(response.body<Link>().uuid)
+                }
+                val body = client.request("uptime/player/$ign").bodyAsText()
                 val member = Json.decodeFromString<Member>(body)
                 val builder = EmbedBuilder()
                 builder.setTitle("Uptime of `$ign`")

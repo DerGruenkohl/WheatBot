@@ -1,5 +1,6 @@
 import buttons.lbbuttons.LeftButton
 import buttons.lbbuttons.RightButton
+import commands.LinkDiscord
 import commands.Uptime
 import commands.UptimeLb
 import commands.Wheat
@@ -11,7 +12,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 
 
 lateinit var jda: JDA
-const val test = false
+const val test = true
 fun main() {
     startup()
 }
@@ -34,11 +35,12 @@ fun startup(){
 
 fun registerCommands(): CommandManager {
     val manager = CommandManager()
-    manager.add(listOf(
+    manager.add(
         Uptime(),
         Wheat(),
-        UptimeLb()
-    ))
+        UptimeLb(),
+        LinkDiscord()
+    )
     return manager
 }
 fun registerButtons(): ButtonManager{

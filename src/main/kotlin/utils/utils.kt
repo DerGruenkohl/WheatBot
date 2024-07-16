@@ -17,7 +17,7 @@ fun getMinecraftUsername(uuid: String): String = runBlocking{
     val url = URL("https://sessionserver.mojang.com/session/minecraft/profile/$uuid")
     val text = client.request(url).bodyAsText()
     client.close()
-    return@runBlocking Json.parseToJsonElement(text).jsonObject["name"].toString()
+    return@runBlocking Json.parseToJsonElement(text).jsonObject["name"].toString().replace("\"", "")
     //val json = JSONObject(jsonText)
    // return@runBlocking json.getString("name")
 }
@@ -28,7 +28,7 @@ fun getMinecraftUUID(name: String): String = runBlocking{
     val client = LocalAPI().client
     val text = client.request(url).bodyAsText()
     client.close()
-    return@runBlocking Json.parseToJsonElement(text).jsonObject["id"].toString()
+    return@runBlocking Json.parseToJsonElement(text).jsonObject["id"].toString().replace("\"", "")
    // val input = url.openConnection().getInputStream()
     //val jsonText = IOUtils.toString(input, "UTF-8")
     //val json = JSONObject(jsonText)

@@ -21,7 +21,7 @@ class Leaderboard {
         val messageBuilder = MessageCreateBuilder()
         val builder = EmbedBuilder()
         val client = LocalAPI().client
-        val response = client.request("http://raspi:8080/api/leaderboard/uptime").bodyAsText()
+        val response = client.request("leaderboard/uptime").bodyAsText()
         val lb = Json.decodeFromString<UptimeLeaderboard>(response)
         val pairsInRange = getPairsInRange(lb.members, startIndex)
 
@@ -29,7 +29,7 @@ class Leaderboard {
         var counter = 1+startIndex
         client.close()
         pairsInRange.forEach {
-            builder.addField("**$counter.**${getMinecraftUsername(it.first)}: ", "${it.second.hours} hours and ${it.second.mins} mins on average", false)
+            builder.addField("**$counter.** `${getMinecraftUsername(it.first)}`: ", "${it.second.hours} hours and ${it.second.mins} mins on average", false)
             counter++
         }
 

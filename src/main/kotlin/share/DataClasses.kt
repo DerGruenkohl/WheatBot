@@ -36,3 +36,9 @@ data class UptimeLeaderboard(
     val size: Int,
     val members: Map<String, time>
 )
+@Serializable
+data class Link(
+    val discordId: Long,
+    val uuid: String,
+    val discordName: String?
+)
