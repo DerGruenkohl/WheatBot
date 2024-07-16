@@ -5,6 +5,7 @@ import listeners.ICommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import utils.dsl.runAsync
 
 class CommandManager : ListenerAdapter() {
     private val commands: MutableList<ICommand> = ArrayList()
@@ -22,9 +23,9 @@ class CommandManager : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         for (command in commands) {
             if (command.name == event.name) {
-                Thread{
+                runAsync{
                     command.execute(event)
-                }.start()
+                }
                 return
             }
         }

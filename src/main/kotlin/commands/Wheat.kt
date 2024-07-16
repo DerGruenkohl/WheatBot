@@ -13,7 +13,7 @@ class Wheat: ICommand {
 
     override fun execute(event: SlashCommandInteractionEvent) {
 
-        val wheat = "https://hmbldtw.spdns.org/~pkruenelke/web/wheat_basic.webp"
+        val wheat = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Wheat_JE2_BE2.png"
         val builder = EmbedBuilder()
         builder.setTitle("Wheat")
         builder.setImage(wheat)
