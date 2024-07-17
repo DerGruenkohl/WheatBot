@@ -8,5 +8,6 @@ interface ICommand {
     val description: String
     val options: List<OptionData>
 
-    fun execute(event: SlashCommandInteractionEvent)
+
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean)
 }

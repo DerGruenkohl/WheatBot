@@ -19,8 +19,10 @@ class UptimeLb: ICommand {
             OptionData(OptionType.STRING, "username", "gets the leaderboard position for a specific user")
             )
 
-    override fun execute(event: SlashCommandInteractionEvent) {
-        val hook = event.reply("Preparing the leaderboard <:wheat_pray:1224363201026850917>").complete()
+    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+        val hook = event.reply("Preparing the leaderboard <:wheat_pray:1224363201026850917>")
+            .setEphemeral(ephemeral)
+            .complete()
         try {
             val lb = Leaderboard()
             var startIndex = if (event.getOption("startpos") != null){

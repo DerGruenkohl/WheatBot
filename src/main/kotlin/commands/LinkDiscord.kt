@@ -22,13 +22,13 @@ class LinkDiscord: ICommand {
     override val options: List<OptionData>
         get() = listOf(OptionData(OptionType.STRING, "username", "Your Username", true))
 
-    override fun execute(event: SlashCommandInteractionEvent){
+    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val name = event.getOption("username")!!.asString
         val hook = event.reply("Linking your account...").setEphemeral(true).complete()
         val link = Link(
             event.user.idLong,
             getMinecraftUUID(name),
-            event.user.globalName
+            event.user.name
         )
         runBlocking {
             val client = LocalAPI().client

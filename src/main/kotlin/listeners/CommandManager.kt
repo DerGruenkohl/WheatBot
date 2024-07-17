@@ -1,20 +1,26 @@
 package listeners
 
 import jda
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.IntegrationType
+import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import utils.dsl.runAsync
 
 class CommandManager : ListenerAdapter() {
     private val commands: MutableList<ICommand> = ArrayList()
     override fun onReady(event: ReadyEvent) {
         for (command in commands) {
-            if (command.options == null) {
-                jda.upsertCommand(command.name, command.description).queue()
-            } else {
-                jda.upsertCommand(command.name, command.description).addOptions(command.options).queue()
-            }
+            val commandData: SlashCommandData = Commands.slash(command.name, command.description)
+            commandData
+                .addOptions(command.options)
+                .setIntegrationTypes(IntegrationType.ALL)
+                .setContexts(InteractionContextType.ALL)
+            jda.upsertCommand(commandData).queue()
         }
 
     }
@@ -23,7 +29,11 @@ class CommandManager : ListenerAdapter() {
         for (command in commands) {
             if (command.name == event.name) {
                 runAsync{
-                    command.execute(event)
+                    var eph = false
+                    if (!event.interaction.applicationPermissions.contains(Permission.MESSAGE_EMBED_LINKS)){
+                        eph = true
+                    }
+                    command.execute(event, eph)
                 }
                 return
             }

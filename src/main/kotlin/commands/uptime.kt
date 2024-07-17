@@ -26,10 +26,12 @@ class Uptime: ICommand {
             options.add(OptionData(OptionType.STRING, "ign", "The ign"))
             return options
         }
-    override fun execute(event: SlashCommandInteractionEvent) {
+    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val option = event.getOption("ign")
         var ign: String? = null
-        val hook = event.deferReply().complete()
+        val hook = event.deferReply()
+            .setEphemeral(ephemeral)
+            .complete()
         try {
             val api = LocalAPI()
             val client = api.client

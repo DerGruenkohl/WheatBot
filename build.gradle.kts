@@ -14,11 +14,15 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://m2.duncte123.dev/releases")
+
+    maven ("https://m2.chew.pro/snapshots")
+    maven("https://jitpack.io")
 }
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("net.dv8tion:JDA:5.0.0-beta.21")
+    implementation("com.github.freya022:JDA:feature~full-user-installable-apps-SNAPSHOT")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
     implementation("com.google.guava:guava:33.2.1-jre")
     implementation("io.ktor:ktor-client-core:$ktor_version")

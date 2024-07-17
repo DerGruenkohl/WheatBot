@@ -11,12 +11,14 @@ class Wheat: ICommand {
     override val description: String
         get() = "get a wheat"
 
-    override fun execute(event: SlashCommandInteractionEvent) {
+    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
 
         val wheat = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Wheat_JE2_BE2.png"
         val builder = EmbedBuilder()
         builder.setTitle("Wheat")
         builder.setImage(wheat)
-        event.replyEmbeds(builder.build()).queue()
+        event.replyEmbeds(builder.build())
+            .setEphemeral(ephemeral)
+            .queue()
     }
 }

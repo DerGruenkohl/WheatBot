@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 
 
 lateinit var jda: JDA
-const val test = true
+const val test = false
 fun main() {
     startup()
 }
