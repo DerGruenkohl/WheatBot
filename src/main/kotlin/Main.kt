@@ -1,9 +1,6 @@
 import buttons.lbbuttons.LeftButton
 import buttons.lbbuttons.RightButton
-import commands.LinkDiscord
-import commands.Uptime
-import commands.UptimeLb
-import commands.Wheat
+import commands.*
 import listeners.ButtonManager
 import listeners.CommandManager
 import net.dv8tion.jda.api.JDA
@@ -39,7 +36,9 @@ fun registerCommands(): CommandManager {
         Uptime(),
         Wheat(),
         UptimeLb(),
-        LinkDiscord()
+        LinkDiscord(),
+        ManageSetting(),
+        GetSettings()
     )
     return manager
 }

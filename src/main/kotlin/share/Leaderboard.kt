@@ -45,7 +45,7 @@ class Leaderboard {
         val messageBuilder = MessageCreateBuilder()
         val builder = EmbedBuilder()
         val client = LocalAPI().client
-        val response = client.request("http://raspi:8080/api/leaderboard/uptime").bodyAsText()
+        val response = client.request("leaderboard/uptime").bodyAsText()
         val lb = Json.decodeFromString<UptimeLeaderboard>(response)
         client.close()
         val uuid = getMinecraftUUID(name)

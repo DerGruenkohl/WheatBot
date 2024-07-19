@@ -40,7 +40,7 @@ class Uptime: ICommand {
                     ign = option.asString
                 }
                 if(ign == null) {
-                    val response = client.request("link/${event.user.id}")
+                    val response = client.request("link/get/${event.user.id}")
                     if (response.status.value >= 300){
                         hook.editOriginal("No Ign applied and no account linked!").queue()
                         return@runBlocking

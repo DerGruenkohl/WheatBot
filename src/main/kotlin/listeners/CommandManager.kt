@@ -29,11 +29,8 @@ class CommandManager : ListenerAdapter() {
         for (command in commands) {
             if (command.name == event.name) {
                 runAsync{
-                    var eph = false
-                    if (!event.interaction.applicationPermissions.contains(Permission.MESSAGE_EMBED_LINKS)){
-                        eph = true
-                    }
-                    command.execute(event, eph)
+                    val ephemeral = !event.interaction.applicationPermissions.contains(Permission.MESSAGE_EMBED_LINKS)
+                    command.execute(event, ephemeral)
                 }
                 return
             }
