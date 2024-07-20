@@ -15,7 +15,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://m2.duncte123.dev/releases")
-
+    maven("https://packages.jetbrains.team/maven/p/kds/kotlin-ds-maven")
     maven ("https://m2.chew.pro/snapshots")
     maven("https://jitpack.io")
 }
@@ -31,6 +31,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.6.0")
+    implementation("org.jetbrains.kotlinx:kotlin-statistics-jvm:0.2.1")
+
 }
 
 tasks.test {
