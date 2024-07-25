@@ -50,7 +50,8 @@ fun registerCommands(): CommandManager {
         LinkDiscord(),
         ManageSetting(),
         GetSettings(),
-        GetData()
+        GetData(),
+        UptimeGraph()
     )
     return manager
 }

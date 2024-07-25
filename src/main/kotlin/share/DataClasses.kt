@@ -24,6 +24,10 @@ data class time(
     override fun compareTo(other: time): Int {
         return compareValuesBy(this, other, time::hours, time::mins)
     }
+
+    override fun toString(): String {
+        return "${this.hours}h, ${this.mins}m"
+    }
 }
 @Serializable
 data class GuildEntry(

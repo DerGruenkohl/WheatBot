@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.kandy.letsplot.translator.toLetsPlot
 import share.PestGain
 import share.TrackingManager
 import share.data.CollectionPlot
+import utils.getMinecraftUsername
 
 class GetData: ICommand {
 
@@ -63,27 +64,42 @@ class GetData: ICommand {
             var userID = event.getOption("user")?.asUser?.idLong
             if (userID == null){ userID = event.user.idLong}
             val manager = TrackingManager(userID)
-            var ephemeral = ephemeral
-            val option = event.getOption("type")!!.asString
-            val settings = manager.getSettings().settings
-            var ownData = false
-            if (!ephemeral){
-                if (!settings.collectionGain && option == "coll"){ephemeral = true; ownData = true}
-                if (!settings.pestGain && option == "pest"){ephemeral = true; ownData = true}
-            }
             val hook = event.deferReply(ephemeral).complete()
+            val option = event.getOption("type")!!.asString
+            val link = manager.getSettings()
+            val settings = link.settings
+            if(!settings.track){hook.editOriginal("user has tracking disabled").queue(); return@runBlocking}
+            var ownData = false
+                if (!settings.collectionGain && option == "coll"){ownData = true}
+                if (!settings.pestGain && option == "pest"){ownData = true}
+
             if (ownData && userID != event.user.idLong){hook.editOriginal("Not Allowed to view this data from this user").queue(); return@runBlocking}
             val name = event.getOption("name")!!.asString
             if (name.contains("_1") && option == "coll"){hook.editOriginal("please select pest for type").queue(); return@runBlocking }
             if (!name.contains("_1") && option != "coll"){hook.editOriginal("please select collection for type").queue(); return@runBlocking }
+            hook.editOriginal("getting data for ${getMinecraftUsername(link.uuid)}.").queue()
             val tracking = manager.getTracking()
-            val time = CollectionPlot(tracking)
-            val plot = time.createPlot(name).toPNG()
-            val upload = FileUpload.fromData(plot, "$name.png")
+            println("track1")
+            if (tracking == null){
+                println("track2")
+                hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
+                return@runBlocking
+            }
+            try {println("track3")
+                val time = CollectionPlot(tracking)
+                println("track4")
+                val plot = time.createPlot(name).toPNG()
+                println("track5")
+                val upload = FileUpload.fromData(plot, "$name.png")
 
-            hook.editOriginal("Here is your data:")
-                .setAttachments(upload)
-                .queue()
+                hook.editOriginal("Here is your data:")
+                    .setAttachments(upload)
+                    .queue()
+
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+
         }
     }
 }

@@ -8,11 +8,13 @@ import io.ktor.http.*
 
 class TrackingManager(private val discordID: Long) {
 
-    suspend fun getTracking(): Tracking{
+    suspend fun getTracking(): Tracking?{
         val api = LocalAPI().client
         val response: HttpResponse = api.get("track/get/$discordID")
-        val body = response.body<Tracking>()
         api.close()
+        if (response.status == HttpStatusCode.NotFound){return null}
+        val body = response.body<Tracking>()
+
         return body
     }
     suspend fun getSettings(): Link{

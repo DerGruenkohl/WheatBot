@@ -17,6 +17,10 @@ class LocalAPI {
             }
             expectSuccess = false
             install(Logging)
+            install(HttpRequestRetry){
+                retryOnServerErrors(3)
+                retryOnException(3, true)
+            }
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true

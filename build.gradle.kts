@@ -18,6 +18,7 @@ repositories {
     maven("https://packages.jetbrains.team/maven/p/kds/kotlin-ds-maven")
     maven ("https://m2.chew.pro/snapshots")
     maven("https://jitpack.io")
+    maven("https://repo.kotlin.link")
 }
 
 dependencies {
