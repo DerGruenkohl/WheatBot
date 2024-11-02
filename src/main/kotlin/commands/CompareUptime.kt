@@ -17,6 +17,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.FileUpload
+import org.jetbrains.kotlinx.dataframe.AnyFrame
+import org.jetbrains.kotlinx.dataframe.DataFrame
+import org.jetbrains.kotlinx.dataframe.api.dataFrameOf
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.letsplot.export.toPNG
 import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
@@ -25,6 +28,7 @@ import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.layers.points
 import org.jetbrains.kotlinx.kandy.letsplot.settings.LineType
 import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
+import org.jetbrains.kotlinx.kandy.letsplot.style.Legend
 import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
@@ -33,88 +37,94 @@ import org.jetbrains.kotlinx.statistics.plotting.smooth.statSmooth
 import org.joda.time.DateTime
 import share.Link
 import share.Member
+import utils.getMeow
 import utils.getMinecraftUsername
 import java.util.Calendar
 import java.util.Date
 import kotlin.math.floor
+import kotlin.random.Random
 
-class UptimeGraph: ICommand {
-    override val name = "uptimegraph"
-    override val description = "Gets the farming uptime of someone with a nice graph (requires to be in a guild)"
+class CompareUptime: ICommand {
+    override val name = "compare_uptime"
+    override val description = "compare your uptime with other players!"
     override val subCommands: List<ISubCommand>
         get() = listOf()
     override val options: List<OptionData>
         get() = listOf(
-                OptionData(OptionType.STRING, "ign", "The ign"),
+                OptionData(OptionType.STRING, "names", "the igns of all players like this: ign1,ign2,ign3,...", true),
             )
 
     override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
-        val option = event.getOption("ign")
-        var ign: String? = null
         val hook = event.deferReply()
             .setEphemeral(ephemeral)
             .complete()
+
+        var meow = getMeow()
+        if (meow == "-1"){meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"}
+        hook.editOriginal("").setEmbeds(
+            EmbedBuilder()
+                .setTitle("Please wait a moment")
+                .setImage(meow)
+                .build()
+        ).complete()
         try {
             val api = LocalAPI()
             val client = api.client
             runBlocking {
-                if(option != null) {
-                    ign = option.asString
-                }
-                if(ign == null) {
-                    val response = client.request("link/get/${event.user.id}")
-                    if (response.status.value >= 300){
-                        hook.editOriginal("No Ign applied and no account linked!").queue()
-                        return@runBlocking
+                val option = event.getOption("names")!!.asString
+                val members = option.split(",")
+                    .map { ign ->
+                        client.request("uptime/player/$ign").body<Member>()
                     }
-                    ign = getMinecraftUsername(response.body<Link>().uuid)
-                }
-                val member = client.request("uptime/player/$ign").body<Member>()
+                client.close()
 
-                val plot = plot {
-                    layout {
-                        size = 854 to 480
-                        theme = Theme.DARCULA
-                        title = "Uptime of $ign"
-
-                    }
-                    y(member.expHistory.values
-                    .map {
-                        it.hours.toFloat()+ it.mins.toFloat()/60f
-                    }.asReversed()){
-                        axis.name = "Hours"
-                    }
-
-
-                    x(member.expHistory.keys
-                        .map {
-                            val date = LocalDate.fromEpochDays(it.toInt())
-                            "${date.dayOfMonth}.${date.month}"
-                        }
-                        .asReversed()
-                    ){
-                        axis.name = "day"
-                    }
+                val frame = membersToDataFrame(members)
+                val plot =frame.plot {
                     line {
-                        color = Color.WHITE
-                        type = LineType.SOLID
+                        x("date")
+                        y("uptime")
+                        color("Players")
                     }
                     points {
-                        size = 3.5
-                        symbol = Symbol.BULLET
-                        color = Color.BLUE
+                        x("date")
+                        y("uptime")
+                        color("Players")
                     }
-
+                    layout {
+                        y.axis.name = "Uptime in mins"
+                        title = "Uptime Comparison"
+                        theme = Theme.HIGH_CONTRAST_DARK
+                    }
                 }.toPNG()
                 hook.editOriginal("")
                     .setAttachments(FileUpload.fromData(plot, "uptime.png"))
+                    .setEmbeds()
                     .queue()
             }
             client.close()
         }catch (e: Exception){
             e.printStackTrace()
-            hook.editOriginal("Something failed, probably $ign is not in a guild").queue()
+            hook.editOriginal("Something failed").queue()
         }
 
+    }
+    fun membersToDataFrame(members: List<Member>): AnyFrame {
+        val months = mutableListOf<String>()
+        val sales = mutableListOf<Int>()
+        val categories = mutableListOf<String>()
+
+        for (member in members) {
+            for ((month, timeEntry) in member.expHistory) {
+                months.add(LocalDate.fromEpochDays(month.toInt()).toString())
+                sales.add(timeEntry.toMinutes())
+                categories.add(getMinecraftUsername(member.uuid))
+            }
+        }
+
+        return dataFrameOf(
+            "date" to months,
+            "uptime" to sales,
+            "Players" to categories
+        )
     }
 }

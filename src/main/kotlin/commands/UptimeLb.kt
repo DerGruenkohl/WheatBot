@@ -1,6 +1,7 @@
 package commands
 
 import listeners.ICommand
+import listeners.ISubCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -13,6 +14,8 @@ class UptimeLb: ICommand {
         get() = "uptimelb"
     override val description: String
         get() = "gets the uptime leaderboard"
+    override val subCommands: List<ISubCommand>
+        get() = listOf()
     override val options: List<OptionData>
         get() = listOf(
             OptionData(OptionType.INTEGER, "startpos", "the start position of the leaderboard"),

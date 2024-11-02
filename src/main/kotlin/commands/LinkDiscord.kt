@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import listeners.ICommand
+import listeners.ISubCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -17,6 +18,8 @@ import utils.getMinecraftUUID
 class LinkDiscord: ICommand {
     override val name: String
         get() = "link"
+    override val subCommands: List<ISubCommand>
+        get() = listOf()
     override val description: String
         get() = "Link your account"
     override val options: List<OptionData>

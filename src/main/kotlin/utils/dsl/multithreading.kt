@@ -1,14 +1,17 @@
 package utils.dsl
 
 import dsl.Multithreading
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 /**
- * Runs the given [block] asynchronously.
+ * Runs the given [block] asynchronously (now using coroutines).
  *
  * @see Multithreading.runAsync
  */
-fun runAsync(block: () -> Unit) = Multithreading.runAsync(block)
+fun runAsync(block: () -> Unit) = CoroutineScope(Dispatchers.Default).runCatching{block.invoke()}
 
 /**
  * Runs the given [block] asynchronously after the given [delay].

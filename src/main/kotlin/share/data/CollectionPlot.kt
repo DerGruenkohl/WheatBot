@@ -16,39 +16,17 @@ import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.layers.points
 import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
 import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
-import org.jetbrains.kotlinx.kandy.letsplot.translator.toLetsPlot
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import org.jetbrains.kotlinx.statistics.kandy.layers.smoothLine
-import org.jetbrains.kotlinx.statistics.kandy.stattransform.statSmooth
-import org.jetbrains.kotlinx.statistics.plotting.smooth.SmoothMethod
-import share.Tracking
-import utils.getMinecraftUsername
+import share.Collections
+import share.CropWeight
+import share.Player
+import share.UncountedCrops
 import kotlin.collections.List
+import kotlin.reflect.full.memberProperties
 
-class CollectionPlot(val tracking: Tracking) {
+class CollectionPlot(val playerData: List<Player>) {
 
-    val timestamps = tracking.data.map {
-       Instant.fromEpochMilliseconds(it.timeStamp).toLocalDateTime(TimeZone.currentSystemDefault())
-           .date
-           .toString()
-    }
-    val longTimestamps = tracking.data.map { it.timeStamp }
-    val carrotCollections = tracking.data.map { it.collections.carrot }
-    val cactusCollections = tracking.data.map { it.collections.cactus }
-    val caneCollections = tracking.data.map { it.collections.cane }
-    val pumpkinCollections = tracking.data.map { it.collections.pumpkin }
-    val wheatCollections = tracking.data.map { it.collections.wheat}
-    val seedsCollections = tracking.data.map { it.collections.seeds }
-    val mushroomCollections = tracking.data.map { it.collections.mushroom }
-    val wartCollections = tracking.data.map { it.collections.wart }
-    val melonCollections = tracking.data.map { it.collections.melon }
-    val potatoCollections = tracking.data.map { it.collections.potato }
-    val pestNames = tracking.data.flatMap { it.pest.map { pest -> pest.pestName } }.distinct()
-    val pestData = pestNames.associateWith { pestName ->
-        tracking.data.map { data ->
-            data.pest.find { it.pestName == pestName }?.collection ?: 0L
-        }
-    }
+    private fun getTimestamps(): List<Long> = playerData.map { it.timestamp }
     fun Long.formatLong(): String {
         return if (this >= 1000000000){
             val billions = this / 1000000000.0
@@ -68,67 +46,76 @@ class CollectionPlot(val tracking: Tracking) {
         return this.map { it.formatLong() }
     }
 
-    val data = mapOf(
-       // "timestamp" to timestamps,
-        "carrot" to carrotCollections,
-        "cactus" to cactusCollections,
-        "cane" to caneCollections,
-        "pumpkin" to pumpkinCollections,
-        "wheat" to wheatCollections,
-        "seeds" to seedsCollections,
-        "mushroom" to mushroomCollections,
-        "wart" to wartCollections,
-        "melon" to melonCollections,
-        "potato" to potatoCollections
-    ) + pestData
-    val colorMap = mapOf(
-        "carrot" to Color.ORANGE,
-        "cactus" to Color.GREEN,
-        "cane" to Color.LIGHT_GREEN,
-        "pumpkin" to Color.ORANGE,
-        "wheat" to Color.YELLOW,
-        "seeds" to Color.YELLOW,
-        "mushroom" to Color.rgb(180, 163, 146),
-        "wart" to Color.RED,
-        "melon" to Color.rgb(255, 106, 106),
-        "potato" to Color.rgb(255, 194, 132)
-    )+ pestNames.associateWith { Color.BLUE }
+    fun createCollectionPlot(name: String): Plot {
+        val data = playerData.map { player ->
+            val property = Collections::class.memberProperties
+                .find { it.name == name }!!.getter.call(player.collections) as Long
+            return@map property
+        }
 
-    fun createPlot(name: String): Plot{
-        val color = colorMap[name] ?: Color.BLACK
-        val username = getMinecraftUsername(tracking.uuid)
-        val plot = plot {
-                val timestamps = longTimestamps
-                val values = data[name]!!
+        return createPlot(data, name)
+    }
+    fun createPestPlot(name: String): Plot {
+        val data = playerData.map { player ->
+            val property = UncountedCrops::class.memberProperties
+                .find { it.name == name }!!.getter.call(player.weight.uncountedCrops) as Int
+            return@map property.toLong()
+        }
 
-            x(timestamps)
-            y(values){
-                scale = continuous(min = values.first(), max = values.last())
-            }
-                points {
-                    size = 3.5
-                    symbol = Symbol.BULLET
-                    this.color = Color.BLUE
-                }
-                line {
-                    this.color = color
-                }
-               /* smoothLine(longTimestamps, values, method = SmoothMethod.LOESS(span = 0.3)) {
-                    this.color = color
+        return createPlot(data, "$name from pests")
+    }
+    fun createWeightPlot(name: String): Plot {
+        val data = playerData.map { player ->
+            val property = CropWeight::class.memberProperties
+                .find { it.name == name }!!.getter.call(player.weight.cropWeight) as Double
+            return@map property.toLong()
+        }
 
-                }*/
-                layout{
-                    title = "${name.replace("_1", "")} collection of $username"
-                    theme = Theme.DARCULA
-                    x.axis.name = "Time"
-                    y.axis.name = "collection"
-                    x.axis.breaksLabeled(longTimestamps, this@CollectionPlot.timestamps)
-                    y.axis.breaksLabeled(values, values.toStringList())
-                    //y.limits = values.first()..values.last()
-                }
-            }
-        return plot
+        return createPlot(data, name)
+    }
+    fun createWeightPlot(): Plot {
+        val data = playerData.map { player ->
+            player.weight.totalWeight.toLong()
+        }
+
+        return createPlot(data, "Farming Weight")
     }
 
 
+
+    private fun createPlot(yAxis: List<Long>, name: String): Plot {
+        val xAxis = getTimestamps()
+        val color = Color.BLUE
+        val plot = plot {
+            val timestamps = xAxis.map {
+                Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.of("America/New_York"))
+                    .date
+                    .toString()
+            }
+
+            x(xAxis)
+            y(yAxis){
+                scale = continuous(min = yAxis.first(), max = yAxis.last())
+            }
+            points {
+                size = 3.5
+                symbol = Symbol.BULLET
+                this.color = Color.BLUE
+            }
+            line {
+                this.color = Color.BLUE
+            }
+
+            layout{
+                title = "Very nice Graph!"
+                theme = Theme.DARCULA
+                x.axis.name = "Date"
+                y.axis.name = name
+                x.axis.breaksLabeled(xAxis.toList(), timestamps)
+                y.axis.breaksLabeled(yAxis, yAxis.toStringList())
+                //y.limits = values.first()..values.last()
+            }
+        }
+        return plot
+    }
 }

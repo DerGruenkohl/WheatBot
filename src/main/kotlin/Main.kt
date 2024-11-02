@@ -1,20 +1,16 @@
+import buttons.approval.Accept
+import buttons.approval.Deny
+import buttons.lbbuttons.Averages
 import buttons.lbbuttons.LeftButton
 import buttons.lbbuttons.RightButton
 import commands.*
-import kotlinx.coroutines.runBlocking
+import commands.gain.Gain
+import commands.overtake.Overtake
 import listeners.ButtonManager
 import listeners.CommandManager
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
-import org.jetbrains.kotlinx.kandy.dsl.plot
-import org.jetbrains.kotlinx.kandy.letsplot.export.save
-import org.jetbrains.kotlinx.kandy.letsplot.layers.area
-import org.jetbrains.kotlinx.kandy.letsplot.layers.line
-import org.jetbrains.kotlinx.kandy.util.color.Color
-import org.jetbrains.kotlinx.statistics.kandy.stattransform.statSmooth
-import share.TrackingManager
-import share.data.CollectionPlot
 
 
 
@@ -30,10 +26,11 @@ fun startup(){
     }else{
         JDABuilder.createDefault(token)
     }
-    builder.enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+    builder.enableIntents(GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
+    builder.setEventPassthrough(true)
     builder.addEventListeners(
         registerCommands(),
-        registerButtons()
+        registerButtons(),
         )
     jda = builder.build()
     jda.awaitReady()
@@ -46,12 +43,19 @@ fun registerCommands(): CommandManager {
     manager.add(
         Uptime(),
         Wheat(),
+        Cat(),
         UptimeLb(),
         LinkDiscord(),
         ManageSetting(),
         GetSettings(),
         GetData(),
-        UptimeGraph()
+        UptimeGraph(),
+        Upload(),
+        CustomColor(),
+        Contests(),
+        Overtake(),
+        Gain(),
+        CompareUptime()
     )
     return manager
 }
@@ -59,7 +63,10 @@ fun registerButtons(): ButtonManager{
     val manager = ButtonManager()
     manager.add(listOf(
         RightButton(),
-        LeftButton()
+        LeftButton(),
+        Averages(),
+        Accept(),
+        Deny()
     ))
     return manager
 }

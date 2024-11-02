@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val logback_version: String by project
 val ktor_version: String by project
+val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -23,7 +24,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("com.github.freya022:JDA:feature~full-user-installable-apps-SNAPSHOT")
+    implementation("com.github.freya022:JDA:d0f7834")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
     implementation("com.google.guava:guava:33.2.1-jre")
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -34,6 +35,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.6.0")
     implementation("org.jetbrains.kotlinx:kotlin-statistics-jvm:0.2.1")
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
 
 }
 

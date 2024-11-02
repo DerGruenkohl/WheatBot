@@ -2,6 +2,7 @@ package share
 
 
 import api.LocalAPI
+import buttons.lbbuttons.Averages
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
@@ -36,8 +37,9 @@ class Leaderboard {
         messageBuilder.setEmbeds(builder.build())
         messageBuilder.addActionRow(
             Button.primary("lbleft", Emoji.fromUnicode("⬅\uFE0F")),
-            Button.primary("lbright", Emoji.fromUnicode("➡\uFE0F"))
+            Button.primary("lbright", Emoji.fromUnicode("➡\uFE0F")),
         )
+        messageBuilder.addActionRow(Button.success("avg", "Leaderboard averages"))
         return@runBlocking messageBuilder.build()
 
     }

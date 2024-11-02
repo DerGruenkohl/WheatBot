@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import listeners.ICommand
+import listeners.ISubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -12,6 +13,8 @@ import share.TrackingManager
 class GetSettings: ICommand {
     override val name: String
         get() = "getsettings"
+    override val subCommands: List<ISubCommand>
+        get() = listOf()
     override val description: String
         get() = "get your linked settings"
     override val options: List<OptionData>
@@ -22,6 +25,10 @@ class GetSettings: ICommand {
         val manager = TrackingManager(event.user.idLong)
         runBlocking {
             val newSettings = manager.getSettings()
+            if (newSettings == null){
+                hook.editOriginal("Failed getting the link, are you linked?").queue()
+                return@runBlocking
+            }
             val json = Json {
                 prettyPrint = true
                 encodeDefaults = true
