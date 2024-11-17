@@ -17,13 +17,39 @@ import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
 import org.jetbrains.kotlinx.statistics.kandy.layers.smoothLine
+import org.jetbrains.kotlinx.statistics.kandy.stattransform.statSmooth
 import org.jetbrains.kotlinx.statistics.plotting.smooth.SmoothMethod
+
 
 import share.time
 import utils.getMinecraftUsername
 
 class LeaderboardPlot(val data: Map<Long, time>) {
     fun createPlot(): Plot {
+       /* return plot{
+            val xs = data.keys
+            val timestamps = data.keys.map {
+                Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.of("America/New_York"))
+                    .date
+                    .toString()
+            }
+            val ys = data.values.map { it.hours + it.mins/60f }
+
+            statSmooth(xs, ys, method = SmoothMethod.LOESS(0.2), smootherPointCount = 150) {
+                line {
+                    x(Stat.x)
+                    y(Stat.y)
+                }
+            }
+            layout{
+                title = "Uptime Leaderboard average"
+                theme = Theme.HIGH_CONTRAST_DARK
+                x.axis.name = "Date"
+                y.axis.name = "Average Uptime in hours"
+                x.axis.breaksLabeled(xs.toList(), timestamps)
+                //y.limits = values.first()..values.last()
+            }
+        }*/
         val color = Color.BLUE
         val plot = plot {
             val longTimestamps = data.keys
@@ -43,16 +69,15 @@ class LeaderboardPlot(val data: Map<Long, time>) {
                 symbol = Symbol.BULLET
                 this.color = Color.BLUE
             }
-            area {
-                this.borderLine.color = Color.BLUE
-                this.fillColor = Color.LIGHT_BLUE
+            line {
+                this.color = Color.BLUE
             }
 
             layout{
                 title = "Uptime Leaderboard average"
-                theme = Theme.DARCULA
+                theme = Theme.HIGH_CONTRAST_DARK
                 x.axis.name = "Date"
-                y.axis.name = "Average Uptime"
+                y.axis.name = "Average Uptime in hours"
                 x.axis.breaksLabeled(longTimestamps.toList(), timestamps)
                 //y.limits = values.first()..values.last()
             }

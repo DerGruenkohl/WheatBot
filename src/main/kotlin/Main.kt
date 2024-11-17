@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 
 
 lateinit var jda: JDA
-const val test: Boolean = false
+const val test: Boolean = true
 fun main() {
     startup()
 }
@@ -55,7 +55,8 @@ fun registerCommands(): CommandManager {
         Contests(),
         Overtake(),
         Gain(),
-        CompareUptime()
+        CompareUptime(),
+        UptimeHistory()
     )
     return manager
 }

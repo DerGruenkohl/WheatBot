@@ -95,8 +95,8 @@ class GainGenerator(private val gain: GraphPlayer, private val goal: Long) {
 
     private fun generateOvertakeImage(): BufferedImage {
 
-        val minecraftFont = javaClass.getResourceAsStream("/Minecraft.ttf")
-        val font = Font.createFont(Font.TRUETYPE_FONT, minecraftFont)
+        val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
 
         val baseImage = javaClass.getResourceAsStream("/wheatField.jpg")
         val image = ImageIO.read(baseImage)

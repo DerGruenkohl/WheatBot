@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import utils.getMinecraftUsername
 import java.awt.*
+import java.awt.font.TextAttribute
 import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
@@ -106,8 +107,8 @@ class Overtake(private val graph: OutgoingGraph) {
 
     private fun generateOvertakeImage(): BufferedImage {
 
-        val minecraftFont = javaClass.getResourceAsStream("/Minecraft.ttf")
-        val font = Font.createFont(Font.TRUETYPE_FONT, minecraftFont)
+        val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
 
         val baseImage = javaClass.getResourceAsStream("/wheatField.jpg")
         val image = ImageIO.read(baseImage)
@@ -152,8 +153,8 @@ class Overtake(private val graph: OutgoingGraph) {
         val data = generateOvertakeDuration()
 
 
-        drawCenteredString(g, getMinecraftUsername(graph.p1.uuid), rects[1].bounds, font.deriveFont(20f))
-        drawCenteredString(g, getMinecraftUsername(graph.p2.uuid), rects[3].bounds, font.deriveFont(20f))
+        drawCenteredString(g, getMinecraftUsername(graph.p1.uuid), rects[1].bounds, font.deriveFont(20f).deriveFont(mapOf(TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_ON)))
+        drawCenteredString(g, getMinecraftUsername(graph.p2.uuid), rects[3].bounds, font.deriveFont(20f).deriveFont(mapOf(TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_ON)))
         g.color = Color.GREEN
         drawCenteredString(g,"+${graph.p1.gain.round(2).formatBigDecimal()}/h", rects[2].bounds, font.deriveFont(20f))
         drawCenteredString(g, "+${graph.p2.gain.round(2).formatBigDecimal()}/h", rects[4].bounds, font.deriveFont(20f))
@@ -168,7 +169,8 @@ class Overtake(private val graph: OutgoingGraph) {
         }
         var type = graph.p1.type
         if (type.isEmpty()) {type = "Weight"}
-        drawCenteredString(g,"Overtake for: $type, Using Gain from the past ${graph.p1.days} days", rects[0].bounds, font.deriveFont(19f))
+        drawCenteredString(g,"Overtake for: $type, Using Gain from the past ${graph.p1.days} days", rects[0].bounds, font.deriveFont(19f).deriveFont(mapOf(
+            TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_ON)))
         g.dispose()
 
         return image
