@@ -33,6 +33,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.6.0")
     implementation("org.jetbrains.kotlinx:kotlin-statistics-jvm:0.2.1")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")

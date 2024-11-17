@@ -6,6 +6,7 @@ import share.Member
 import utils.GaussianFilter
 import utils.getMinecraftUsername
 import java.awt.*
+import java.awt.font.TextAttribute
 import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
@@ -19,7 +20,7 @@ import kotlin.math.floor
 class UptimeImage(private val member: Member, private val custom: String? = null, private var color: Color? = null) {
     fun createImage(width: Int = 530, height: Int = 450): BufferedImage {
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        if (color == null){color = Color(0,0,138)}
+        if (color == null){color = Color.WHITE}
         val g: Graphics2D = image.createGraphics()
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
@@ -48,8 +49,9 @@ class UptimeImage(private val member: Member, private val custom: String? = null
 
 
         val minecraftFont = javaClass.getResourceAsStream("/Minecraft.ttf")
-        val font = Font.createFont(Font.TRUETYPE_FONT, minecraftFont)
-
+        val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
+        font.deriveFont(mapOf(TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_ON))
 
         val ign = getMinecraftUsername(member.uuid)
 
@@ -60,7 +62,7 @@ class UptimeImage(private val member: Member, private val custom: String? = null
 
         g.color = color
 
-        g.font = font.deriveFont(32f)
+        g.font = font.deriveFont(32f).deriveFont(mapOf(TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_LOW_TWO_PIXEL))
         g.drawString("Uptime of: $ign", 20, 40)
 
         g.font = font.deriveFont(24f)

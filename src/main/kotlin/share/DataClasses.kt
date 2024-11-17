@@ -29,6 +29,7 @@ data class time(
         return "${this.hours}h, ${this.mins}m"
     }
     fun toMinutes(): Int = this.hours * 60 + this.mins
+    fun toHours(): Double = this.hours + this.mins/60.0
 }
 @Serializable
 data class GuildEntry(
