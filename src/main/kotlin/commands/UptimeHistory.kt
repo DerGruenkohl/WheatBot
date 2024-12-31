@@ -30,7 +30,7 @@ import share.Types
 import utils.getMinecraftUsername
 
 class UptimeHistory: ICommand {
-    override val name = "uptimehistoy"
+    override val name = "uptimehistory"
     override val description = "Gets the historical farming uptime of someone (data from before 3.11.24 may be inaccurate)"
     override val subCommands: List<ISubCommand>
         get() = listOf()
