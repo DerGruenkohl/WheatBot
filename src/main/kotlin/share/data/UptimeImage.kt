@@ -13,6 +13,7 @@ import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URL
+import javax.imageio.IIOException
 import javax.imageio.ImageIO
 import kotlin.math.floor
 
@@ -97,9 +98,20 @@ class UptimeImage(private val member: Member, private val custom: String? = null
         yPosition += 20
         g.drawString("on average per day", 20, yPosition)
 
-        val skin = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${member.uuid}/full"))
+        lateinit var skin: BufferedImage
+        var scale = 0.3
+        var flip = false
 
-        val scale = 0.3
+        try {
+            skin = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${member.uuid}/full"))
+        }catch (e: IIOException){
+            println("Failed to get skin from starlight, falling back to crafatar")
+
+            skin = ImageIO.read(URL("https://crafatar.com/renders/body/${member.uuid}"))
+            scale = 0.9
+            flip = true
+        }
+
 
         val w: Int = skin.width
         val h: Int = skin.height
@@ -109,8 +121,14 @@ class UptimeImage(private val member: Member, private val custom: String? = null
         val h2 = (h * scale).toInt()
         val after = BufferedImage(w2, h2, BufferedImage.TYPE_INT_ARGB)
         val scaleInstance = AffineTransform.getScaleInstance(scale, scale)
-        val scaleOp = AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_BILINEAR)
 
+        if (flip){
+            val tx = AffineTransform.getScaleInstance(-1.0, 1.0)
+            tx.translate(-skin.getWidth(null).toDouble(), 0.0)
+            val op = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
+            skin = op.filter(skin, null)
+        }
+        val scaleOp = AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_BILINEAR)
         scaleOp.filter(skin, after)
 
         g.drawImage(after, 350, 50, null)
