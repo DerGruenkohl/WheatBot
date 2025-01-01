@@ -40,23 +40,6 @@ fun startup(){
 
 fun registerCommands(): CommandManager {
     val manager = CommandManager()
-    /*manager.add(
-        Uptime(),
-        Wheat(),
-        UptimeLb(),
-        LinkDiscord(),
-        ManageSetting(),
-        GetSettings(),
-        GetData(),
-        UptimeGraph(),
-        Upload(),
-        CustomColor(),
-        Contests(),
-        Overtake(),
-        Gain(),
-        CompareUptime(),
-        UptimeHistory()
-    )*/
     manager.loadCommandsFromDirectory("src/main/kotlin/commands")
     return manager
 }
