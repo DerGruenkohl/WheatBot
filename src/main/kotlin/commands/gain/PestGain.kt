@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.ISubCommand
+import listeners.Option
+import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.Command.Choice
@@ -18,35 +20,52 @@ import utils.getMeow
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-class PestGain: ISubCommand {
-    override val name: String
-        get() = "pest"
-    override val description: String
-        get() = "pest gain"
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.STRING, "username", "first user").setRequired(true),
-            OptionData(OptionType.STRING, "type", "the specific type for the gain prediction", true)
-                .addChoices(
-                    Choice("mite", "mite"),
-                    Choice("cricket", "cricket"),
-                    Choice("moth", "moth"),
-                    Choice("worm", "worm"),
-                    Choice("slug", "slug"),
-                    Choice("beetle", "beetle"),
-                    Choice("locust", "locust"),
-                    Choice("rat", "rat"),
-                    Choice("mosquito", "mosquito"),
-                    Choice("fly", "fly"),
-                ),
-            OptionData(OptionType.INTEGER, "days", "the past x days for calculating the gain", true)
-                .setMinValue(1)
-                .setMaxValue(30),
-            OptionData(OptionType.STRING, "goal", "the goal (must be a valid number)", true)
 
+@SubCommand(
+    name = "pests",
+    description = "pest gain",
+    options = [
+        Option(
+            name = "username",
+            description = "first user",
+            type = OptionType.STRING,
+            required = true
+        ),
+        Option(
+            name = "type",
+            description = "the specific type for the gain prediction",
+            type = OptionType.STRING,
+            required = true,
+            choices = [
+                listeners.Choice("mite", "mite"),
+                listeners.Choice("cricket", "cricket"),
+                listeners.Choice("moth", "moth"),
+                listeners.Choice("worm", "worm"),
+                listeners.Choice("slug", "slug"),
+                listeners.Choice("beetle", "beetle"),
+                listeners.Choice("locust", "locust"),
+                listeners.Choice("rat", "rat"),
+                listeners.Choice("mosquito", "mosquito"),
+                listeners.Choice("fly", "fly"),
+            ]
+        ),
+        Option(
+            name = "days",
+            description = "the past x days for calculating the gain (1-30)",
+            type = OptionType.INTEGER,
+            required = true
+        ),
+        Option(
+            name = "goal",
+            description = "the goal (must be a valid number, defaults to 1B)",
+            type = OptionType.STRING,
+            required = true
         )
+    ]
 
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+)
+class PestGain {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply(ephemeral).complete()
         var meow = getMeow()
         if (meow == "-1"){meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"}

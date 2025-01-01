@@ -18,6 +18,7 @@ import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL
+import javax.imageio.IIOException
 import javax.imageio.ImageIO
 
 
@@ -117,9 +118,17 @@ class Overtake(private val graph: OutgoingGraph) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
+
+        var head1 = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
+        var head2 = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
         //read the heads
-        var head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p1.uuid}/face"))
-        var head2 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p2.uuid}/face"))
+        try {
+            head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p1.uuid}/face") )
+            head2 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p2.uuid}/face"))
+        }catch (e: IIOException){
+            println("Skin api died")
+        }
+
 
         // Flip the image horizontally
         val tx = AffineTransform.getScaleInstance(-1.0, 1.0)

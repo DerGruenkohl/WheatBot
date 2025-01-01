@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.ISubCommand
+import listeners.Option
+import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -17,21 +19,32 @@ import utils.getMeow
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-class WeightGain: ISubCommand {
-    override val name: String
-        get() = "weight"
-    override val description: String
-        get() = "weight gain"
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.STRING, "username", "first user").setRequired(true),
-            OptionData(OptionType.INTEGER, "days", "the amount of days", true)
-                .setMinValue(1)
-                .setMaxValue(30),
-            OptionData(OptionType.STRING, "goal", "the past x days for calculating the gain", true)
+@SubCommand(
+    name = "weight",
+    description = "weight overtake",
+    options = [
+        Option(
+            name = "username",
+            description = "first user",
+            type = OptionType.STRING,
+            required = true
+        ),
+        Option(
+            name = "days",
+            description = "the past x days for calculating the gain (1-30)",
+            type = OptionType.INTEGER,
+            required = true
+        ),
+        Option(
+            name = "goal",
+            description = "the goal for the gain calculation (must be a number, defaults to 1B)",
+            type = OptionType.STRING,
+            required = true
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class WeightGain {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply(ephemeral).complete()
         var meow = getMeow()
         if (meow == "-1"){meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"}

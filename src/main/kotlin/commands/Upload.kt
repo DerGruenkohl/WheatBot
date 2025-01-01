@@ -1,34 +1,29 @@
 package commands
 
-import io.ktor.http.*
-import listeners.ICommand
-import listeners.ISubCommand
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.utils.FileUpload
-import org.apache.commons.io.FileUtils
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.net.URI
 import java.net.URL
 import javax.imageio.ImageIO
 
-class Upload: ICommand {
-    override val name: String
-        get() = "upload"
-    override val description: String
-        get() = "upload a custom background image"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.ATTACHMENT, "image", "the background image")
+@Command(
+    name = "upload",
+    description = "upload a custom background image",
+    options = [
+        Option(
+            name = "image",
+            description = "the background image",
+            type = OptionType.ATTACHMENT
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class Upload {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply().complete()
         val file = event.getOption("image")!!.asAttachment
 

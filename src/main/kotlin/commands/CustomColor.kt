@@ -1,12 +1,11 @@
 package commands
 
 import kotlinx.coroutines.runBlocking
-import listeners.ICommand
-import listeners.ISubCommand
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.FileUpload
 import share.TrackingManager
 import java.awt.Color
@@ -17,20 +16,20 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
 
-class CustomColor: ICommand {
-    override val name: String
-        get() = "textcolor"
-    override val description: String
-        get() = "change the text color in the /uptime command"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.STRING, "color", "the hex code of the color")
-                .setRequired(true)
+@Command(
+    name = "textcolor",
+    description = "change the text color in the /uptime command",
+    options = [
+        Option(
+            name = "color",
+            description = "the hex code of the color",
+            type = OptionType.STRING,
+            required = true
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class CustomColor {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply(true).complete()
         val manager = TrackingManager(event.user.idLong)
         runBlocking {

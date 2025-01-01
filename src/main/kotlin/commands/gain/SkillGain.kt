@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.ISubCommand
+import listeners.Option
+import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.Command.Choice
@@ -18,36 +20,51 @@ import utils.getMeow
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-class SkillGain: ISubCommand {
-    override val name: String
-        get() = "skill"
-    override val description: String
-        get() = "skill gain"
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.STRING, "username", "first user").setRequired(true),
-            OptionData(OptionType.STRING, "type", "the specific type for the gain prediction", true)
-                .addChoices(
-                    Choice("combat", "combat"),
-                    Choice("mining", "mining"),
-                    Choice("foraging", "foraging"),
-                    Choice("fishing", "fishing"),
-                    Choice("enchanting", "enchanting"),
-                    Choice("alchemy", "alchemy"),
-                    Choice("taming", "taming"),
-                    Choice("carpentry", "carpentry"),
-                    Choice("runecrafting", "runecrafting"),
-                    Choice("social", "social"),
-                    Choice("farming", "farming"),
-                ),
-            OptionData(OptionType.INTEGER, "days", "the past x days for calculating the gain", true)
-                .setMinValue(1)
-                .setMaxValue(30),
-            OptionData(OptionType.STRING, "goal", "the goal (must be a valid number)", true)
-
+@SubCommand(
+    name = "skills",
+    description = "skill gain",
+    options = [
+        Option(
+            name = "username",
+            description = "first user",
+            type = OptionType.STRING,
+            required = true
+        ),
+        Option(
+            name = "type",
+            description = "the specific type for the gain prediction",
+            type = OptionType.STRING,
+            required = true,
+            choices = [
+                listeners.Choice("combat", "combat"),
+                listeners.Choice("mining", "mining"),
+                listeners.Choice("foraging", "foraging"),
+                listeners.Choice("fishing", "fishing"),
+                listeners.Choice("enchanting", "enchanting"),
+                listeners.Choice("alchemy", "alchemy"),
+                listeners.Choice("taming", "taming"),
+                listeners.Choice("carpentry", "carpentry"),
+                listeners.Choice("runecrafting", "runecrafting"),
+                listeners.Choice("social", "social"),
+                listeners.Choice("farming", "farming"),
+            ]
+        ),
+        Option(
+            name = "days",
+            description = "the past x days for calculating the gain (1-30)",
+            type = OptionType.INTEGER,
+            required = true
+        ),
+        Option(
+            name = "goal",
+            description = "the goal (must be a valid number)",
+            type = OptionType.STRING,
+            required = true
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class SkillGain {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply(ephemeral).complete()
         var meow = getMeow()
         if (meow == "-1"){meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"}

@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.ISubCommand
+import listeners.Option
+import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -18,6 +20,30 @@ import utils.getMeow
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
+@SubCommand(
+    name = "weight",
+    description = "weight overtake",
+    options = [
+        Option(
+            name = "username1",
+            description = "first user",
+            type = OptionType.STRING,
+            required = true
+        ),
+        Option(
+            name = "username2",
+            description = "second user",
+            type = OptionType.STRING,
+            required = true
+        ),
+        Option(
+            name = "days",
+            description = "the past x days for calculating the gain (1-30)",
+            type = OptionType.INTEGER,
+            required = true
+        )
+    ]
+)
 class Weight: ISubCommand {
     override val name: String
         get() = "weight"

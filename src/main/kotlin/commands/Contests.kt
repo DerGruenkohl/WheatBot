@@ -4,12 +4,11 @@ import api.LocalAPI
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
-import listeners.ICommand
-import listeners.ISubCommand
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import share.ContestHandler
 import share.Link
 import share.getContest
@@ -17,21 +16,20 @@ import utils.getMinecraftUUID
 import utils.getMinecraftUsername
 import java.awt.Color
 import java.io.IOException
-import kotlin.math.max
 
-class Contests: ICommand {
-    override val name: String
-        get() = "contests"
-    override val description: String
-        get() = "gets a contest graph"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val options: List<OptionData>
-        get() = listOf(
-            OptionData(OptionType.STRING, "name", "ign of the user")
+@Command(
+    name = "contests",
+    description = "gets a contest graph",
+    options = [
+        Option(
+            type = OptionType.STRING,
+            name = "name",
+            description = "ign of the user"
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class Contests {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         runBlocking {
             val hook = event.deferReply(ephemeral).complete()
             val option = event.getOption("name")

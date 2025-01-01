@@ -4,49 +4,36 @@ import api.LocalAPI
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
-import listeners.ICommand
-import listeners.ISubCommand
+import listeners.*
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.FileUpload
-import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.letsplot.export.toPNG
-import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
-import org.jetbrains.kotlinx.kandy.letsplot.layers.line
-import org.jetbrains.kotlinx.kandy.letsplot.layers.points
-import org.jetbrains.kotlinx.kandy.letsplot.settings.LineType
-import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
-import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
-import org.jetbrains.kotlinx.kandy.letsplot.x
-import org.jetbrains.kotlinx.kandy.letsplot.y
-import org.jetbrains.kotlinx.kandy.util.color.Color
 import share.HistoricalUptime
 import share.Link
-import share.Member
 import share.Types
 import utils.getMinecraftUsername
 
-class UptimeHistory: ICommand {
-    override val name = "uptimehistory"
-    override val description = "Gets the historical farming uptime of someone (data from before 3.11.24 may be inaccurate)"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val options: List<OptionData>
-        get() = listOf(
-
-            OptionData(OptionType.STRING, "type", "the type", true).addChoices(
-                Command.Choice("total","total"),
-                Command.Choice("30d","thirty"),
-                Command.Choice("7d","seven"),
-                Command.Choice("weeks","weeks"),
-            ),
-            OptionData(OptionType.STRING, "ign", "The ign"),
+@Command(
+    name = "uptimehistory",
+    description = "Gets the historical farming uptime of someone (data from before 3.11.24 may be inaccurate)",
+    options = [
+        Option(
+            name = "type",
+            description = "the type",
+            type = OptionType.STRING,
+            required = true,
+            choices = [
+                Choice("total","total"),
+                Choice("30d","thirty"),
+                Choice("7d","seven"),
+                Choice("weeks","weeks"),
+            ]
         )
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    ]
+)
+class UptimeHistory {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val option = event.getOption("ign")
         var ign: String? = null
         val hook = event.deferReply()

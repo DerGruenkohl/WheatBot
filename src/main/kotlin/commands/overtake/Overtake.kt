@@ -1,26 +1,16 @@
 package commands.overtake
 
-import listeners.ICommand
-import listeners.ISubCommand
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import listeners.Command
 
-class Overtake: ICommand {
-    override val name: String
-        get() = "overtake"
-    override val description: String
-        get() = "overtake prediction"
-    override val subCommands: List<ISubCommand>
-        get() = listOf(
-            Collection(),
-            Pests(),
-            Skills(),
-            Weight()
-        )
-    override val options: List<OptionData>
-        get() = listOf()
 
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
-
-    }
-}
+@Command(
+    name = "overtake",
+    description = "overtake prediction",
+    subCommands = [
+        Collection::class,
+        Pests::class,
+        Skills::class,
+        Weight::class
+    ]
+)
+class Overtake

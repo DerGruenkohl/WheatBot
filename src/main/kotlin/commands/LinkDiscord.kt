@@ -7,25 +7,27 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import listeners.ICommand
-import listeners.ISubCommand
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import share.Link
 import utils.getMinecraftUUID
 
-class LinkDiscord: ICommand {
-    override val name: String
-        get() = "link"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val description: String
-        get() = "Link your account"
-    override val options: List<OptionData>
-        get() = listOf(OptionData(OptionType.STRING, "username", "Your Username", true))
-
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+@Command(
+    name = "link",
+    description = "Link your account",
+    options = [
+        Option(
+            type = OptionType.STRING,
+            name = "username",
+            description = "Your Username",
+            required = true
+        )
+    ]
+)
+class LinkDiscord {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val name = event.getOption("username")!!.asString
         val hook = event.reply("Linking your account...").setEphemeral(true).complete()
         val link = Link(

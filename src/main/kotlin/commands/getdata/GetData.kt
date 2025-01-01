@@ -1,4 +1,4 @@
-package commands
+package commands.getdata
 
 import kotlinx.coroutines.runBlocking
 import listeners.ICommand
@@ -15,6 +15,7 @@ import share.TrackingManager
 import share.data.CollectionPlot
 import utils.getMinecraftUsername
 
+//TODO(Refractor to use SubCommands)
 class GetData: ICommand {
     val collectionChoices = listOf(
         Choice("carrot", "carrot"),

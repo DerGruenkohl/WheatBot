@@ -1,44 +1,36 @@
 package commands
 
 import api.LocalAPI
-import apiUrl
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
-import kotlinx.serialization.json.Json
-import listeners.ICommand
-import listeners.ISubCommand
-import net.dv8tion.jda.api.EmbedBuilder
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.FileUpload
 import share.Link
 import share.Member
 import share.data.UptimeImage
 import utils.getMinecraftUsername
 import java.awt.Color
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.InputStream
 import javax.imageio.ImageIO
-import kotlin.math.floor
 
-class Uptime: ICommand {
-    override val name = "uptime"
-    override val description = "Gets the farming uptime of someone (requires to be in a guild)"
-    override val subCommands: List<ISubCommand>
-        get() = listOf()
-    override val options: List<OptionData>
-        get() {
-            val options = ArrayList<OptionData>()
-            options.add(OptionData(OptionType.STRING, "ign", "The ign"))
-            return options
-        }
-    override fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+@Command(
+    name = "uptime",
+    description = "Gets the farming uptime of someone (requires to be in a guild)",
+    options = [
+        Option(
+            type = OptionType.STRING,
+            name = "ign",
+            description = "The ign"
+        )
+    ]
+)
+class Uptime {
+    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val option = event.getOption("ign")
         var ign: String? = null
         val hook = event.deferReply()
