@@ -1,10 +1,8 @@
 package listeners
 
 import jda
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
-import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Entitlement
@@ -20,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.findAnnotation
 
@@ -93,14 +92,25 @@ class CommandManager : ListenerAdapter() {
                         val cmd = subCmdsAnnotation?.find { subCmdAnnotation ->
                             subCmd == subCmdAnnotation.findAnnotation<SubCommand>()!!.name
                         }?.createInstance()!!
-                        val cmdMethod = cmd::class.members.find { it.name == "execute" }
+                        val cmdMethod = cmd::class.members.find { it.name == "execute" }?: return@launch
                         println(subCmd)
-
-                        cmdMethod?.call(cmd, event, ephemeral)
+                        if(cmdMethod.isSuspend){
+                            runBlocking {
+                                cmdMethod.call(cmd, event, ephemeral, this)
+                            }
+                        }else{
+                            cmdMethod.call(cmd, event, ephemeral)
+                        }
                         return@launch
                     }
-                    val method = command::class.members.find { it.name == "execute" }
-                    method?.call(command, event, ephemeral)
+                    val method = command::class.members.find { it.name == "execute" }?: return@launch
+                    if (method.isSuspend) {
+                        runBlocking {
+                            method.call(command,event, ephemeral, this)
+                        }
+                    } else {
+                        method.call(command,event, ephemeral)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace() // Log any exceptions for debugging
                 }
