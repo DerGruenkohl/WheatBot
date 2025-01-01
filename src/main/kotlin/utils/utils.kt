@@ -86,5 +86,5 @@ fun getMeow() : String{
 
     // Close the connection
     connection.disconnect()
-    return "-1"
+    return "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"
 }
