@@ -21,10 +21,11 @@ import share.Collections
 import share.CropWeight
 import share.Player
 import share.UncountedCrops
+import utils.getMinecraftUsername
 import kotlin.collections.List
 import kotlin.reflect.full.memberProperties
 
-class CollectionPlot(val playerData: List<Player>) {
+class CollectionPlot(val playerData: List<Player>, var days: Int) {
 
     private fun getTimestamps(): List<Long> = playerData.map { it.timestamp }
     fun Long.formatLong(): String {
@@ -83,8 +84,12 @@ class CollectionPlot(val playerData: List<Player>) {
 
 
 
-    private fun createPlot(yAxis: List<Long>, name: String): Plot {
-        val xAxis = getTimestamps()
+    private fun createPlot(input: List<Long>, name: String): Plot {
+        if (days == 0){
+            days = input.size
+        }
+        val xAxis = getTimestamps().take(days)
+        val yAxis = input.take(days)
         val color = Color.BLUE
         val plot = plot {
             val timestamps = xAxis.map {
@@ -107,7 +112,7 @@ class CollectionPlot(val playerData: List<Player>) {
             }
 
             layout{
-                title = "Very nice Graph!"
+                title = "data for ${getMinecraftUsername(playerData.first().uuid)}"
                 theme = Theme.DARCULA
                 x.axis.name = "Date"
                 y.axis.name = name

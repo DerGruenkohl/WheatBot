@@ -16,32 +16,13 @@ import utils.dsl.runAsync
 import utils.getMinecraftUsername
 
 @SubCommand(
-    name = "pests",
-    description = "get the tracked pest collection data of a user",
+    name = "weight",
+    description = "get the tracked weight of a user",
     options = [
         Option(
             name = "user",
-            description = "the user to get the pest collection data of",
+            description = "the user to get the weight data of",
             type = OptionType.USER,
-            required = true
-        ),
-        Option(
-            name = "type",
-            description = "the collection type to get",
-            type = OptionType.STRING,
-            choices = [
-                Choice("carrot", "carrot"),
-                Choice("cactus", "cactus"),
-                Choice("cane", "sugarCane"),
-                Choice("pumpkin", "pumpkin"),
-                Choice("wheat", "wheat"),
-                Choice("seeds", "seeds"),
-                Choice("mushroom", "mushroom"),
-                Choice("wart", "wart"),
-                Choice("melon", "melon"),
-                Choice("potato", "potato"),
-                Choice("cocoa", "cocoaBeans"),
-            ],
             required = true
         ),
         Option(
@@ -51,13 +32,12 @@ import utils.getMinecraftUsername
         )
     ]
 )
-class Pests {
-    suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+class Weight {
+     suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = withContext(Dispatchers.IO) {
             event.deferReply(ephemeral).complete()
         }
         val userID = event.getOption("user")?.asUser?.idLong ?: event.user.idLong
-        val type = event.getOption("type")?.asString ?: return ErrorHandler.handle("no type found", hook)
         val days = event.getOption("days")?.asInt ?: 0
 
         val manager = TrackingManager(userID)
@@ -73,13 +53,11 @@ class Pests {
             hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
             return
         }
-
-        if (!settings.pestGain){hook.editOriginal("pest view disabled").queue(); return}
         val plot = CollectionPlot(tracking, days)
 
-        val data = plot.createPestPlot(type).toPNG()
+        val data = plot.createWeightPlot().toPNG()
 
-        val upload = FileUpload.fromData(data, "$type.png")
+        val upload = FileUpload.fromData(data, "weight.png")
         hook.editOriginal("Here is your data:")
             .setAttachments(upload)
             .queue()

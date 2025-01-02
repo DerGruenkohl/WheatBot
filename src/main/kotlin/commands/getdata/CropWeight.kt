@@ -16,12 +16,12 @@ import utils.dsl.runAsync
 import utils.getMinecraftUsername
 
 @SubCommand(
-    name = "pests",
-    description = "get the tracked pest collection data of a user",
+    name = "cropweight",
+    description = "get the tracked crop weight of a user",
     options = [
         Option(
             name = "user",
-            description = "the user to get the pest collection data of",
+            description = "the user to get the weight data of",
             type = OptionType.USER,
             required = true
         ),
@@ -51,8 +51,8 @@ import utils.getMinecraftUsername
         )
     ]
 )
-class Pests {
-    suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+class CropWeight {
+     suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = withContext(Dispatchers.IO) {
             event.deferReply(ephemeral).complete()
         }
@@ -74,10 +74,10 @@ class Pests {
             return
         }
 
-        if (!settings.pestGain){hook.editOriginal("pest view disabled").queue(); return}
+        if (!settings.collectionGain){hook.editOriginal("collection view disabled").queue(); return}
         val plot = CollectionPlot(tracking, days)
 
-        val data = plot.createPestPlot(type).toPNG()
+        val data = plot.createWeightPlot(type).toPNG()
 
         val upload = FileUpload.fromData(data, "$type.png")
         hook.editOriginal("Here is your data:")
