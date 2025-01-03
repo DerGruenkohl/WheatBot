@@ -2,7 +2,6 @@ package commands.getdata
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import listeners.Choice
 import listeners.Option
 import listeners.SubCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -12,7 +11,6 @@ import org.jetbrains.kotlinx.kandy.letsplot.export.toPNG
 import share.ErrorHandler
 import share.TrackingManager
 import share.data.CollectionPlot
-import utils.dsl.runAsync
 import utils.getMinecraftUsername
 
 @SubCommand(

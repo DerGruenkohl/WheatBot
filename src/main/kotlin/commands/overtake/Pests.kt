@@ -6,13 +6,11 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.Choice
-import listeners.ISubCommand
 import listeners.Option
 import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.FileUpload
 import share.OutgoingGraph
 import share.Overtake

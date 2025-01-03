@@ -3,8 +3,6 @@ package buttons.approval
 import listeners.IButton
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
-import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.buttons.Button
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.net.URL

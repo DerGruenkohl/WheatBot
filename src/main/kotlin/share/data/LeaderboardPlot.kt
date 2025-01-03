@@ -1,5 +1,6 @@
 package share.data
 
+
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -7,22 +8,14 @@ import org.jetbrains.kotlinx.kandy.dsl.continuous
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.ir.Plot
 import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
-import org.jetbrains.kotlinx.kandy.letsplot.layers.area
 import org.jetbrains.kotlinx.kandy.letsplot.layers.line
-import org.jetbrains.kotlinx.kandy.letsplot.layers.path
 import org.jetbrains.kotlinx.kandy.letsplot.layers.points
 import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
 import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import org.jetbrains.kotlinx.statistics.kandy.layers.smoothLine
-import org.jetbrains.kotlinx.statistics.kandy.stattransform.statSmooth
-import org.jetbrains.kotlinx.statistics.plotting.smooth.SmoothMethod
-
-
 import share.time
-import utils.getMinecraftUsername
 
 class LeaderboardPlot(val data: Map<Long, time>) {
     fun createPlot(): Plot {

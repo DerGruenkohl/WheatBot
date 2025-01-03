@@ -1,11 +1,13 @@
 package share.data
 
-import io.ktor.http.*
 import kotlinx.datetime.LocalDate
 import share.Member
 import utils.GaussianFilter
 import utils.getMinecraftUsername
-import java.awt.*
+import java.awt.Color
+import java.awt.Font
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 import java.awt.font.TextAttribute
 import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D

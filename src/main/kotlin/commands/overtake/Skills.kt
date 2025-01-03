@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import listeners.Choice
-import listeners.ISubCommand
 import listeners.Option
 import listeners.SubCommand
 import net.dv8tion.jda.api.EmbedBuilder

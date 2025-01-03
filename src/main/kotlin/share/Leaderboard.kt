@@ -2,7 +2,6 @@ package share
 
 
 import api.LocalAPI
-import buttons.lbbuttons.Averages
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking

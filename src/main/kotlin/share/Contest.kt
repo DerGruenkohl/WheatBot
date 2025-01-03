@@ -1,7 +1,6 @@
 package share
 
 import api.LocalAPI
-import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
@@ -10,7 +9,6 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 
 suspend fun getContest(uuid:String) : List<Contest> {

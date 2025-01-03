@@ -7,22 +7,21 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.kotlinx.kandy.dsl.continuous
-import org.jetbrains.kotlinx.kandy.letsplot.*
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.ir.Plot
 import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
-import org.jetbrains.kotlinx.kandy.letsplot.layers.area
 import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.layers.points
 import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
 import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
+import org.jetbrains.kotlinx.kandy.letsplot.x
+import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
 import share.Collections
 import share.CropWeight
 import share.Player
 import share.UncountedCrops
 import utils.getMinecraftUsername
-import kotlin.collections.List
 import kotlin.reflect.full.memberProperties
 
 class CollectionPlot(val playerData: List<Player>, var days: Int) {

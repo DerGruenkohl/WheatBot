@@ -7,7 +7,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
-import utils.HumanProgressBar
 import utils.getMinecraftUsername
 import java.awt.*
 import java.awt.geom.AffineTransform
@@ -182,8 +181,8 @@ class GainGenerator(private val gain: GraphPlayer, private val goal: Long) {
     fun generateGain(): Pair<MessageEmbed, BufferedImage> {
         val embed = generateOvertakeEmbed()
         val img = generateOvertakeImage()
-        val file = File("images/image.png")
-        ImageIO.write(img, "png", file)
+        //val file = File("images/image.png")
+        //ImageIO.write(img, "png", file)
         println(embed.description)
         return Pair(embed, img)
     }

@@ -4,7 +4,9 @@ import api.LocalAPI
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
-import listeners.*
+import listeners.Choice
+import listeners.Command
+import listeners.Option
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.utils.FileUpload

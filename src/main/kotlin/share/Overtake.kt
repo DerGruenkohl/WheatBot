@@ -1,10 +1,5 @@
 package share
 
-import api.LocalAPI
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import utils.getMinecraftUsername
@@ -14,7 +9,6 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL
