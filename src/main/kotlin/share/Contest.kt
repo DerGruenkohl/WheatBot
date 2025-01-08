@@ -1,6 +1,7 @@
 package share
 
-import api.LocalAPI
+
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
@@ -11,17 +12,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 
-suspend fun getContest(uuid:String) : List<Contest> {
-    val client = LocalAPI().client
-    val contests = client.request("https://api.elitebot.dev/contests/$uuid").body<List<Contest>>()
-    client.close()
-    return contests
-}
-
-fun main() = runBlocking {
-    val handler = ContestHandler(getContest("f2a924b8c1624f37b2b38ce35b6e271a"))
-    handler.print()
-}
+suspend inline fun getContest(uuid:String) : List<Contest> = client.request("https://api.elitebot.dev/contests/$uuid").body<List<Contest>>()
 
 @Serializable
 data class Contest(

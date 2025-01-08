@@ -1,7 +1,7 @@
 package share
 
 
-import api.LocalAPI
+import api.ApiInstance
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
@@ -20,14 +20,13 @@ class Leaderboard {
     fun createUptimeLB(startIndex: Int): MessageCreateData= runBlocking {
         val messageBuilder = MessageCreateBuilder()
         val builder = EmbedBuilder()
-        val client = LocalAPI().client
-        val response = client.request("leaderboard/uptime").bodyAsText()
+
+        val response = ApiInstance.client.request("leaderboard/uptime").bodyAsText()
         val lb = Json.decodeFromString<UptimeLeaderboard>(response)
         val pairsInRange = getPairsInRange(lb.members, startIndex)
 
         builder.setTitle("Uptime Leaderboard from ${startIndex+1} till ${startIndex+10}")
         var counter = 1+startIndex
-        client.close()
         pairsInRange.forEach {
             builder.addField("**$counter.** `${getMinecraftUsername(it.first)}`: ", "${it.second.hours} hours and ${it.second.mins} mins on average", false)
             counter++
@@ -45,10 +44,8 @@ class Leaderboard {
     fun getStartIndex(name: String): Int= runBlocking {
         val messageBuilder = MessageCreateBuilder()
         val builder = EmbedBuilder()
-        val client = LocalAPI().client
-        val response = client.request("leaderboard/uptime").bodyAsText()
+        val response = ApiInstance.client.request("leaderboard/uptime").bodyAsText()
         val lb = Json.decodeFromString<UptimeLeaderboard>(response)
-        client.close()
         val uuid = getMinecraftUUID(name)
 
         return@runBlocking lb.members.keys.indexOfFirst { it.replace("-", "") == uuid }

@@ -1,6 +1,6 @@
 package commands
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
@@ -51,15 +51,13 @@ class CompareUptime {
                 .build()
         ).complete()
         try {
-            val api = LocalAPI()
-            val client = api.client
+
             runBlocking {
                 val option = event.getOption("names")!!.asString
                 val members = option.split(",")
                     .map { ign ->
                         client.request("uptime/player/$ign").body<Member>()
                     }
-                client.close()
 
                 val frame = membersToDataFrame(members)
                 val plot =frame.plot {
@@ -84,7 +82,6 @@ class CompareUptime {
                     .setEmbeds()
                     .queue()
             }
-            client.close()
         }catch (e: Exception){
             e.printStackTrace()
             hook.editOriginal("Something failed").queue()

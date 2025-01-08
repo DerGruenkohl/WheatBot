@@ -1,10 +1,6 @@
 package share
 
-import api.LocalAPI
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
+import io.ktor.util.logging.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import utils.getMinecraftUsername
@@ -17,10 +13,14 @@ import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL
+import javax.imageio.IIOException
 import javax.imageio.ImageIO
 
 
 class GainGenerator(private val gain: GraphPlayer, private val goal: Long) {
+    private val LOGGER = KtorSimpleLogger("GainImage")
+
+
     fun Double.round(decimals: Int): BigDecimal {
         return BigDecimal(this).setScale(decimals, RoundingMode.HALF_EVEN)
     }
@@ -104,13 +104,17 @@ class GainGenerator(private val gain: GraphPlayer, private val goal: Long) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
-        //read the heads
-        var head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${gain.uuid}/full"))
 
-        // scale and draw the heads
-        head1 = scaleImage(head1)
+        try {
+            //read the heads
+            var head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${gain.uuid}/full"))
+            // scale and draw the heads
+            head1 = scaleImage(head1)
 
-        g.drawImage(head1, image.width - head1.width -50, 65, null)
+            g.drawImage(head1, image.width - head1.width -50, 65, null)
+        } catch (e: IIOException) {
+            LOGGER.info("Skin api died again}")
+        }
 
         //Draw the text boxes
         val rects = listOf(
@@ -186,20 +190,4 @@ class GainGenerator(private val gain: GraphPlayer, private val goal: Long) {
         println(embed.description)
         return Pair(embed, img)
     }
-}
-
-fun main() = runBlocking {
-    val data = GainBody(
-        "Sau_Del",
-        "collection",
-        "wheat",
-        7
-    )
-    val client = LocalAPI().client
-    val resp =client.post("gain"){
-        contentType(ContentType.Application.Json)
-        setBody(data)
-    }
-    val gain =GainGenerator(resp.body<GraphPlayer>(), 10_000_000_000)
-    val genGain =gain.generateGain()
 }

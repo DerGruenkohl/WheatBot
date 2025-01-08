@@ -3,9 +3,7 @@ import buttons.approval.Deny
 import buttons.lbbuttons.Averages
 import buttons.lbbuttons.LeftButton
 import buttons.lbbuttons.RightButton
-import commands.*
-import commands.gain.Gain
-import commands.overtake.Overtake
+import io.ktor.util.logging.*
 import listeners.ButtonManager
 import listeners.CommandManager
 import net.dv8tion.jda.api.JDA
@@ -13,19 +11,16 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
 
 
-
 lateinit var jda: JDA
-const val test: Boolean = true
+const val test: Boolean = false
+private val LOGGER = KtorSimpleLogger("Main")
+
 fun main() {
     startup()
 }
 
 fun startup(){
-    val builder = if(test){
-        JDABuilder.createDefault(testToken)
-    }else{
-        JDABuilder.createDefault(token)
-    }
+    val builder = JDABuilder.createDefault(Config.token)
     builder.enableIntents(GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
     builder.setEventPassthrough(true)
     builder.addEventListeners(
@@ -34,13 +29,13 @@ fun startup(){
         )
     jda = builder.build()
     jda.awaitReady()
-    println("${jda.selfUser.name} is ready")
+    LOGGER.info("${jda.selfUser.name} is ready")
 
 }
 
 fun registerCommands(): CommandManager {
     val manager = CommandManager()
-    manager.loadCommandsFromDirectory("src/main/kotlin/commands")
+    manager.loadCommandsFromJar()
     return manager
 }
 fun registerButtons(): ButtonManager{

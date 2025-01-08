@@ -1,6 +1,6 @@
 package share
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
@@ -30,9 +30,7 @@ class HistoricalUptime(private val name: String, private val type: Types) {
 
     @Throws(Exception::class)
     private suspend fun getMember(): Member {
-        val client = LocalAPI().client
         val member = client.request("uptime/historical/$name").body<Member>()
-        client.close()
         return member
     }
     private fun memberToDataFrame(member: Member): AnyFrame {
@@ -119,9 +117,4 @@ class HistoricalUptime(private val name: String, private val type: Types) {
             }
         }
     }
-}
-fun main() = runBlocking {
-    val uptime = HistoricalUptime("CubityFirst", Types.WEEKS)
-    uptime.createPlot().save("uptime.png")
-    println("meow")
 }

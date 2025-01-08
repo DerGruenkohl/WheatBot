@@ -1,5 +1,6 @@
 package share
 
+import io.ktor.util.logging.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import utils.getMinecraftUsername
@@ -17,6 +18,8 @@ import javax.imageio.ImageIO
 
 
 class Overtake(private val graph: OutgoingGraph) {
+    private val LOGGER = KtorSimpleLogger("OvertakeImage")
+
     fun Double.round(decimals: Int): BigDecimal {
         return BigDecimal(this).setScale(decimals, RoundingMode.HALF_EVEN)
     }
@@ -113,30 +116,26 @@ class Overtake(private val graph: OutgoingGraph) {
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
 
-        var head1 = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
-        var head2 = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
+        var head1 = BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB)
+        var head2 = BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB)
         //read the heads
         try {
             head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p1.uuid}/face") )
             head2 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p2.uuid}/face"))
+
+            // Flip the image horizontally
+            val tx = AffineTransform.getScaleInstance(-1.0, 1.0)
+            tx.translate(-head1.getWidth(null).toDouble(), 0.0)
+            val op = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
+            // scale and draw the heads
+            head1 = scaleImage(op.filter(head1, null))
+            head2 = scaleImage(head2)
+
+            g.drawImage(head1, 10+head2.width/2, 180- head1.height/2, null)
+            g.drawImage(head2, image.width - head2.width -50, 180-head2.height/2, null)
         }catch (e: IIOException){
-            println("Skin api died")
+            LOGGER.info("Skin api died")
         }
-
-
-        // Flip the image horizontally
-        val tx = AffineTransform.getScaleInstance(-1.0, 1.0)
-
-        tx.translate(-head1.getWidth(null).toDouble(), 0.0)
-
-        val op = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
-        // scale and draw the heads
-        head1 = scaleImage(op.filter(head1, null))
-        head2 = scaleImage(head2)
-
-        g.drawImage(head1, 10+head2.width/2, 180- head1.height/2, null)
-        g.drawImage(head2, image.width - head2.width -50, 180-head2.height/2, null)
-
         val rectX = (image.width - head2.width -10 - head2.width).toFloat()
         //Draw the text boxes
         val rects = listOf(

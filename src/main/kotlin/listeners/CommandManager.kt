@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+import share.ErrorHandler
 import java.io.File
 import java.net.JarURLConnection
 import java.net.URLClassLoader
@@ -93,20 +94,19 @@ class CommandManager : ListenerAdapter() {
                     }
 
                     val cmdAnnotation = command::class.findAnnotation<Command>()
+                    logger.info("running command: ${cmdAnnotation?.name} from ${event.user.name}")
                     event.subcommandName?.let { subCmd ->
-
                         val subCmdsAnnotation = cmdAnnotation?.subCommands
                         val cmd = subCmdsAnnotation?.find { subCmdAnnotation ->
                             subCmd == subCmdAnnotation.findAnnotation<SubCommand>()!!.name
                         }?.createInstance()!!
                         val cmdMethod = cmd::class.members.find { it.name == "execute" }?: return@launch
+                        logger.info("running subcommand: $subCmd from ${event.user.name}")
                         if(cmdMethod.isSuspend){
                             runBlocking {
-                                logger.info("running subcommand: $subCmd from ${event.user.name}")
                                 cmdMethod.call(cmd, event, ephemeral, this)
                             }
                         }else{
-                            logger.info("running subcommand: $subCmd from ${event.user.name}")
                             cmdMethod.call(cmd, event, ephemeral)
                         }
                         return@launch
@@ -114,15 +114,17 @@ class CommandManager : ListenerAdapter() {
                     val method = command::class.members.find { it.name == "execute" }?: return@launch
                     if (method.isSuspend) {
                         runBlocking {
-                            logger.info("running command: ${cmdAnnotation?.name} from ${event.user.name}")
                             method.call(command,event, ephemeral, this)
                         }
                     } else {
-                        logger.info("running command: ${cmdAnnotation?.name} from ${event.user.name}")
                         method.call(command,event, ephemeral)
                     }
                 } catch (e: Exception) {
                     logger.error(e)
+                    ErrorHandler.handle("""
+                        An internal error occured. Please report this to 
+                        <@657264019450888214> (salamibrod)
+                    """.trimIndent(), event.hook)
                 }
             }
         }

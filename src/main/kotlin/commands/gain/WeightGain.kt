@@ -1,6 +1,6 @@
 package commands.gain
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -65,7 +65,6 @@ class WeightGain {
             "",
             days
         )
-        val client = LocalAPI().client
         runBlocking {
             val resp =client.post("gain"){
                 contentType(ContentType.Application.Json)
@@ -76,7 +75,6 @@ class WeightGain {
                 return@runBlocking
             }
             val g = resp.body<GraphPlayer>()
-            client.close()
 
             val overtake = GainGenerator(g, goal)
             val gen = overtake.generateGain()

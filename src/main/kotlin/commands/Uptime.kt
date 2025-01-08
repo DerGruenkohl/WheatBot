@@ -1,14 +1,17 @@
 package commands
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.runBlocking
+import io.ktor.util.logging.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import listeners.Command
 import listeners.Option
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.utils.FileUpload
+import share.ErrorHandler
 import share.Link
 import share.Member
 import share.data.UptimeImage
@@ -30,89 +33,89 @@ import javax.imageio.ImageIO
     ]
 )
 class Uptime {
-    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    private val LOGGER = KtorSimpleLogger("Uptime")
+    suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val option = event.getOption("ign")
         var ign: String? = null
-        val hook = event.deferReply()
-            .setEphemeral(ephemeral)
-            .complete()
+        val hook = withContext(Dispatchers.IO) {
+            event.deferReply()
+                .setEphemeral(ephemeral)
+                .complete()
+        }
         try {
-            val api = LocalAPI()
-            val client = api.client
-            runBlocking {
-                val response = client.request("link/get/${event.user.id}")
-                if(option != null) {
-                    ign = option.asString
-                }
-                if(ign == null) {
+            val response = client.request("link/get/${event.user.id}")
+            if (option != null) {
+                ign = option.asString
+            }
+            if (ign == null) {
 
-                    if (response.status.value >= 300){
-                        hook.editOriginal("No Ign applied and no account linked!").queue()
-                        return@runBlocking
-                    }
-                    try {
-                        ign = getMinecraftUsername(response.body<Link>().uuid)
-                    }catch (e: IOException){
-                        hook.editOriginal("No Ign applied and no account linked!").queue()
-                        return@runBlocking
-                    }
-
+                if (response.status.value >= 300) {
+                    hook.editOriginal("No Ign applied and no account linked!").queue()
+                    return
                 }
-                val custom: String? = if (response.status.value >= 300){
-                    println("failed to get settings")
-                    null
-                }else{
-                    if(response.body<Link>().settings.customImage){
-                        println("setting userid")
-                        event.user.id
-                    }else{
-                        println("setting disabled")
-                        null
-                    }
+                try {
+                    ign = getMinecraftUsername(response.body<Link>().uuid)
+                } catch (e: IOException) {
+                    hook.editOriginal("No Ign applied and no account linked!").queue()
+                    return
                 }
-                val color: Color? = if (response.status.value >= 300){
-                    println("failed to get settings")
-                    null
-                }else {
-                    if (response.body<Link>().settings.textColor == null) {
-                        null
-                    } else {
-                        Color.decode(response.body<Link>().settings.textColor)
-                    }
-                }
-
-                println(custom)
-                val member = client.request("uptime/player/$ign").body<Member>()
-                val imageGen = UptimeImage(member, custom, color)
-
-                val image = imageGen.createImage()
-                val os = ByteArrayOutputStream()
-                ImageIO.write(image, "png", os)
-                hook.editOriginal("")
-                    .setFiles(FileUpload.fromData(os.toByteArray(), "uptime.png"))
-                    .queue()
-
-                /*var totalhours = 0
-                var totalmins = 0
-                member.expHistory.forEach {
-                    totalmins += it.value.mins
-                    totalhours += it.value.hours
-                    val date = LocalDate.fromEpochDays(it.key.toInt())
-                    builder.appendDescription(" `${date.dayOfMonth}.${date.month.value}.${date.year}` - ${it.value.hours}h ${it.value.mins}m \n")
-                }
-                totalhours += floor(totalmins/60f).toInt()
-                builder.appendDescription("\n`$ign` has farmed a total of $totalhours hours and ${totalmins.mod(60)} mins this week\n")
-                val avghrs = totalhours /7f
-                val hoursInt = floor(avghrs).toInt()
-                val minutes = ((avghrs - hoursInt) * 60).toInt()
-                builder.appendDescription("`$ign` has farmed $hoursInt hours and $minutes mins on average per day")
-                */
 
             }
-            client.close()
-        }catch (e: Exception){
-            e.printStackTrace()
-            hook.editOriginal("Something failed, probably $ign is not in a guild").queue()
+            val custom: String? = if (response.status.value >= 300) {
+                println("failed to get settings")
+                null
+            } else {
+                if (response.body<Link>().settings.customImage) {
+                    println("setting userid")
+                    event.user.id
+                } else {
+                    println("setting disabled")
+                    null
+                }
+            }
+            val color: Color? = if (response.status.value >= 300) {
+                println("failed to get settings")
+                null
+            } else {
+                if (response.body<Link>().settings.textColor == null) {
+                    null
+                } else {
+                    Color.decode(response.body<Link>().settings.textColor)
+                }
+            }
+
+            println(custom)
+            val member = client.request("uptime/player/$ign").body<Member>()
+            val imageGen = UptimeImage(member, custom, color)
+
+            val image = imageGen.createImage()
+            val os = ByteArrayOutputStream()
+            withContext(Dispatchers.IO) {
+                ImageIO.write(image, "png", os)
+            }
+            hook.editOriginal("")
+                .setFiles(FileUpload.fromData(os.toByteArray(), "uptime.png"))
+                .queue()
+
+            /*var totalhours = 0
+            var totalmins = 0
+            member.expHistory.forEach {
+                totalmins += it.value.mins
+                totalhours += it.value.hours
+                val date = LocalDate.fromEpochDays(it.key.toInt())
+                builder.appendDescription(" `${date.dayOfMonth}.${date.month.value}.${date.year}` - ${it.value.hours}h ${it.value.mins}m \n")
+            }
+            totalhours += floor(totalmins/60f).toInt()
+            builder.appendDescription("\n`$ign` has farmed a total of $totalhours hours and ${totalmins.mod(60)} mins this week\n")
+            val avghrs = totalhours /7f
+            val hoursInt = floor(avghrs).toInt()
+            val minutes = ((avghrs - hoursInt) * 60).toInt()
+            builder.appendDescription("`$ign` has farmed $hoursInt hours and $minutes mins on average per day")
+            */
+
+        } catch (e: Exception) {
+            LOGGER.error(e)
+            ErrorHandler.handle(e, hook)
         }
 
     }

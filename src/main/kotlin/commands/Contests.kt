@@ -1,15 +1,18 @@
 package commands
 
-import api.LocalAPI
+import api.ApiInstance
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.runBlocking
+import io.ktor.util.logging.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import listeners.Command
 import listeners.Option
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import share.ContestHandler
+import share.ErrorHandler
 import share.Link
 import share.getContest
 import utils.getMinecraftUUID
@@ -29,28 +32,17 @@ import java.io.IOException
     ]
 )
 class Contests {
-    fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
-        runBlocking {
-            val hook = event.deferReply(ephemeral).complete()
-            val option = event.getOption("name")
-            var ign: String? = null
-            val client = LocalAPI().client
-            val response = client.request("link/get/${event.user.id}")
-            if(option != null) {
-                ign = option.asString
-            }
-            if(ign == null) {
+    private val LOGGER = KtorSimpleLogger("Contests")
+    suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+        val hook = withContext(Dispatchers.IO) {
+            event.deferReply(ephemeral).complete()
+        }
+        var ign = event.getOption("name")?.asString
 
-                if (response.status.value >= 300){
-                    hook.editOriginal("No Ign applied and no account linked!").queue()
-                    return@runBlocking
-                }
-                try {
-                    ign = getMinecraftUsername(response.body<Link>().uuid)
-                }catch (e: IOException){
-                    hook.editOriginal("No Ign applied and no account linked!").queue()
-                    return@runBlocking
-                }
+        try {
+            if (ign == null) {
+                val response = ApiInstance.client.request("link/get/${event.user.id}")
+                ign = getMinecraftUsername(response.body<Link>().uuid)
 
             }
             val contests = getContest(getMinecraftUUID(ign))
@@ -58,31 +50,29 @@ class Contests {
 
             val embed = EmbedBuilder()
             embed.setTitle("Contest Activity")
-            if (contests.isEmpty()){
+            if (contests.isEmpty()) {
                 embed.setColor(Color.RED)
                 embed.setDescription("No contests found for $ign")
                 hook.editOriginal("").setEmbeds(embed.build()).queue()
-                return@runBlocking
+                return
             }
             val builder = StringBuilder()
             val contestMap = manager.getContest().toMap().toSortedMap()
             builder.append("Showing hourly contests for **${ign}**\nGraph is on a 24 hour period based on time of contest.\nShowing over time period: **All Time**\n\n")
 
-            contestMap.forEach {(hour, count)->
-                if (contestMap.values.max() < 10){
+            contestMap.forEach { (hour, count) ->
+                if (contestMap.values.max() < 10) {
                     builder.append("[${"█".repeat(count)}] (**$count**) \n")
-                }
-                else{
+                } else {
                     val scale = (contestMap.values.maxOrNull() ?: 10) / 10
-                    builder.append("[${"█".repeat(count/scale)}] (**$count**) \n")
+                    builder.append("[${"█".repeat(count / scale)}] (**$count**) \n")
                 }
             }
-
-
             embed.setDescription(builder.toString())
-
             hook.editOriginal("").setEmbeds(embed.build()).queue()
-
+        } catch (e: Exception) {
+            LOGGER.error(e)
+            ErrorHandler.handle(e, hook)
         }
     }
 }

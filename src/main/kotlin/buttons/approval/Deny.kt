@@ -1,12 +1,13 @@
 package buttons.approval
 
+import io.ktor.util.logging.*
 import listeners.IButton
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 
 class Deny(override val id: String= "deny") : IButton {
+    val LOGGER = KtorSimpleLogger("DenyButton")
     override fun execute(event: ButtonInteractionEvent) {
-
         try {
             val userID = event.message.contentDisplay
             val file = event.message.attachments[0]
@@ -22,7 +23,7 @@ class Deny(override val id: String= "deny") : IButton {
             event.jda.retrieveUserById(userID).complete().openPrivateChannel().complete().sendMessage("Your custom background image has been denied.").queue()
         }
         catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.error(e)
         }
 
     }

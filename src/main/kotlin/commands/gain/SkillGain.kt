@@ -1,6 +1,6 @@
 package commands.gain
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -85,7 +85,6 @@ class SkillGain {
             type,
             days
         )
-        val client = LocalAPI().client
         runBlocking {
 
             try {
@@ -97,7 +96,6 @@ class SkillGain {
                     hook.editOriginal("Something went wrong while fetching the data. Most Likely someone had their API off for longer than the specified duration").queue()
                     return@runBlocking
                 }
-                client.close()
                 val g = resp.body<GraphPlayer>()
                 val overtake = GainGenerator(g, goal)
                 val gen = overtake.generateGain()

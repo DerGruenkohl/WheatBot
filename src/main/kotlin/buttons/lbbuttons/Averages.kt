@@ -1,6 +1,6 @@
 package buttons.lbbuttons
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,6 @@ import share.time
 
 class Averages(override val id: String = "avg") : IButton {
     override fun execute(event: ButtonInteractionEvent) {
-        val client = LocalAPI().client
         val hook = event.deferReply().setEphemeral(event.message.isEphemeral).complete()
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {

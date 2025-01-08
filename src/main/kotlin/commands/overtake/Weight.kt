@@ -1,6 +1,6 @@
 package commands.overtake
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -66,9 +66,8 @@ class Weight {
             "",
             days
         )
-        val client = LocalAPI().client
         runBlocking {
-            val resp =client.post("overtake"){
+            val resp = client.post("overtake"){
                 contentType(ContentType.Application.Json)
                 setBody(data)
             }
@@ -77,7 +76,6 @@ class Weight {
                 return@runBlocking
             }
             val g = resp.body<OutgoingGraph>()
-            client.close()
 
             val overtake = Overtake(g)
             val gen = overtake.generateOvertake()

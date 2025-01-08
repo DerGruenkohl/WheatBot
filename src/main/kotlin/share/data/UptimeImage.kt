@@ -1,5 +1,6 @@
 package share.data
 
+import io.ktor.util.logging.*
 import kotlinx.datetime.LocalDate
 import share.Member
 import utils.GaussianFilter
@@ -21,6 +22,8 @@ import kotlin.math.floor
 
 
 class UptimeImage(private val member: Member, private val custom: String? = null, private var color: Color? = null) {
+    private val LOGGER = KtorSimpleLogger("UptimeImage")
+
     fun createImage(width: Int = 530, height: Int = 450): BufferedImage {
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         if (color == null){color = Color.WHITE}
@@ -107,7 +110,7 @@ class UptimeImage(private val member: Member, private val custom: String? = null
         try {
             skin = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${member.uuid}/full"))
         }catch (e: IIOException){
-            println("Failed to get skin from starlight, falling back to crafatar")
+            LOGGER.info("Failed to get skin from starlight, falling back to crafatar")
 
             skin = ImageIO.read(URL("https://crafatar.com/renders/body/${member.uuid}"))
             scale = 0.9

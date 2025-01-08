@@ -1,6 +1,6 @@
 package commands
 
-import api.LocalAPI
+import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
@@ -43,8 +43,6 @@ class UptimeHistory {
             .complete()
 
         try {
-            val api = LocalAPI()
-            val client = api.client
             runBlocking {
                 if(option != null) {
                     ign = option.asString
@@ -74,7 +72,6 @@ class UptimeHistory {
                     .setAttachments(FileUpload.fromData(plot, "uptime.png"))
                     .queue()
             }
-            client.close()
         }catch (e: Exception){
             e.printStackTrace()
             hook.editOriginal("Something failed, probably $ign doesnt have his uptime tracked").queue()
