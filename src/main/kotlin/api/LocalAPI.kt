@@ -1,6 +1,7 @@
 package api
 
-import apiUrl
+import Config.apiUrl
+import Config.key
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -9,18 +10,21 @@ import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
-import key
+import io.ktor.util.logging.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 
-class LocalAPI {
+private class LocalAPI {
     val client by lazy {
         HttpClient(CIO) {
             defaultRequest {
                 url(apiUrl)
             }
-            expectSuccess = false
+            expectSuccess = true
             install(Logging)
-            install(HttpRequestRetry){
+            install(HttpRequestRetry) {
                 retryOnServerErrors(3)
                 retryOnException(3, true)
             }
@@ -42,3 +46,24 @@ class LocalAPI {
     }
 }
 
+object ApiInstance {
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
+    private var _client: HttpClient? = null
+    private val LOGGER = KtorSimpleLogger("LocalAPIInstance")
+
+    val client: HttpClient
+        get() {
+            if (_client == null) {
+                LOGGER.info("Creating new client")
+                _client = LocalAPI().client
+            }
+            return _client!!
+        }
+
+    fun close() {
+        LOGGER.info("Closing client")
+        _client?.close()
+        job.cancel()
+    }
+}
