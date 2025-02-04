@@ -96,7 +96,7 @@ class CommandManager : ListenerAdapter() {
                     val interaction = event.interaction
                     var ephemeral = false
 
-                    if (!interaction.hasFullGuild() && event.channel is GuildChannel) {
+                    if (!interaction.isFromGuild && event.channel is GuildChannel) {
                         val member = event.member
                         val channel = event.channel as GuildChannel
                         val permissions = member?.getPermissionsExplicit(channel)

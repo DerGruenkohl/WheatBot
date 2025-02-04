@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.utils.FileUpload
 import okhttp3.internal.toLongOrDefault
+import share.ErrorHandler
 import share.GainBody
 import share.GainGenerator
 import share.GraphPlayer
@@ -86,7 +87,6 @@ class SkillGain {
             days
         )
         runBlocking {
-
             try {
                 val resp =client.post("gain"){
                     contentType(ContentType.Application.Json)
@@ -106,9 +106,8 @@ class SkillGain {
                     .setEmbeds(gen.first)
                     .queue()
             }catch (e: Exception){
-                e.printStackTrace()
+                ErrorHandler.handle(e, hook)
             }
-
 
         }
     }

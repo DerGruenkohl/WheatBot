@@ -38,30 +38,34 @@ class Weight {
         val userID = event.getOption("user")?.asUser?.idLong ?: event.user.idLong
         val days = event.getOption("days")?.asInt ?: 0
 
-        val manager = TrackingManager(userID)
-        val link = manager.getSettings() ?: return ErrorHandler.handle("no settings found", hook)
+         try {
+             val manager = TrackingManager(userID)
+             val link = manager.getSettings() ?: return ErrorHandler.handle("no settings found", hook)
 
-        val settings = link.settings
-        if(!settings.track){hook.editOriginal("user has tracking disabled").queue(); return}
+             val settings = link.settings
+             if(!settings.track){hook.editOriginal("user has tracking disabled").queue(); return}
 
-        hook.editOriginal("getting data for ${getMinecraftUsername(link.uuid)}.").queue()
-        val tracking = manager.getTracking()
-        println("track1")
-        if (tracking.isEmpty()){
-            hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
-            return
-        }
-        val plot = CollectionPlot(tracking, days)
+             hook.editOriginal("getting data for ${getMinecraftUsername(link.uuid)}.").queue()
+             val tracking = manager.getTracking()
+             println("track1")
+             if (tracking.isEmpty()){
+                 hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
+                 return
+             }
+             val plot = CollectionPlot(tracking, days)
 
-        val data = plot.createWeightPlot().toPNG()
+             val data = plot.createWeightPlot().toPNG()
 
-        val upload = FileUpload.fromData(data, "weight.png")
-        hook.editOriginal("Here is your data:")
-            .setAttachments(upload)
-            .queue()
+             val upload = FileUpload.fromData(data, "weight.png")
+             hook.editOriginal("Here is your data:")
+                 .setAttachments(upload)
+                 .queue()
+         } catch (e: Exception) {
+             ErrorHandler.handle(e, hook)
+         }
 
 
-    }
+     }
 
 
 }

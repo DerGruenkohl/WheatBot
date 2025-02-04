@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.utils.FileUpload
 import okhttp3.internal.toLongOrDefault
+import share.ErrorHandler
 import share.GainBody
 import share.GainGenerator
 import share.GraphPlayer
@@ -87,23 +88,27 @@ class PestGain {
             days
         )
         runBlocking {
-            val resp =client.post("gain"){
-                contentType(ContentType.Application.Json)
-                setBody(data)
+            try {
+                val resp =client.post("gain"){
+                    contentType(ContentType.Application.Json)
+                    setBody(data)
+                }
+                if (resp.status.value >= 300){
+                    hook.editOriginal("Something went wrong while fetching the data. Most Likely someone had their API off for longer than the specified duration").queue()
+                    return@runBlocking
+                }
+                val g = resp.body<GraphPlayer>()
+                val overtake = GainGenerator(g, goal)
+                val gen = overtake.generateGain()
+                val os = ByteArrayOutputStream()
+                ImageIO.write(gen.second, "png", os)
+                hook.editOriginal("")
+                    .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                    .setEmbeds(gen.first)
+                    .queue()
+            } catch (e: Exception) {
+                ErrorHandler.handle(e, hook)
             }
-            if (resp.status.value >= 300){
-                hook.editOriginal("Something went wrong while fetching the data. Most Likely someone had their API off for longer than the specified duration").queue()
-                return@runBlocking
-            }
-            val g = resp.body<GraphPlayer>()
-            val overtake = GainGenerator(g, goal)
-            val gen = overtake.generateGain()
-            val os = ByteArrayOutputStream()
-            ImageIO.write(gen.second, "png", os)
-            hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
-                .setEmbeds(gen.first)
-                .queue()
 
         }
     }

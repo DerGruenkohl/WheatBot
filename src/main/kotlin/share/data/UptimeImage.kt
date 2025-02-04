@@ -15,6 +15,7 @@ import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
@@ -33,13 +34,19 @@ class UptimeImage(private val member: Member, private val custom: String? = null
 
         var imageURL = URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg")
 
-        custom?.let {
-            val file = File("images/$custom").listFiles()!![0]
-            imageURL = file.toURI().toURL()
+
+        try {
+            custom?.let {
+                val file = File("images/$custom").listFiles()!![0]
+                imageURL = file.toURI().toURL()
+            }
+        } catch (e: NullPointerException) {
+            LOGGER.warn("Failed to get custom image, falling back to default")
+            imageURL = URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg")
         }
 
 
-       //  val imageURL = URL("https://images.stockcake.com/public/8/1/2/812761e3-f576-4cce-acbe-68aea54aba55_large/golden-wheat-field-stockcake.jpg")
+        //  val imageURL = URL("https://images.stockcake.com/public/8/1/2/812761e3-f576-4cce-acbe-68aea54aba55_large/golden-wheat-field-stockcake.jpg")
         val wheatImage = ImageIO.read(imageURL)
         //var newWheat = BufferedImage(width, height, wheatImage.type)
 

@@ -71,7 +71,6 @@ class Contests {
             embed.setDescription(builder.toString())
             hook.editOriginal("").setEmbeds(embed.build()).queue()
         } catch (e: Exception) {
-            LOGGER.error(e)
             ErrorHandler.handle(e, hook)
         }
     }

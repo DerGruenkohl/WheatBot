@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.utils.FileUpload
+import share.ErrorHandler
 import share.OutgoingGraph
 import share.Overtake
 import share.OvertakeBody
@@ -88,24 +89,24 @@ class Pests {
             days
         )
         runBlocking {
-            val resp = client.post("overtake"){
-                contentType(ContentType.Application.Json)
-                setBody(data)
-            }
-            if (resp.status.value >= 300){
-                hook.editOriginal("Something went wrong while fetching the data. Most Likely someone had their API off for longer than the specified duration").queue()
-                return@runBlocking
-            }
-            val g = resp.body<OutgoingGraph>()
+            try {
+                val resp = client.post("overtake"){
+                    contentType(ContentType.Application.Json)
+                    setBody(data)
+                }
+                val g = resp.body<OutgoingGraph>()
 
-            val overtake = Overtake(g)
-            val gen = overtake.generateOvertake()
-            val os = ByteArrayOutputStream()
-            ImageIO.write(gen.second, "png", os)
-            hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
-                .setEmbeds(gen.first)
-                .queue()
+                val overtake = Overtake(g)
+                val gen = overtake.generateOvertake()
+                val os = ByteArrayOutputStream()
+                ImageIO.write(gen.second, "png", os)
+                hook.editOriginal("")
+                    .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                    .setEmbeds(gen.first)
+                    .queue()
+            } catch (e: Exception) {
+                ErrorHandler.handle(e, hook)
+            }
 
         }
     }

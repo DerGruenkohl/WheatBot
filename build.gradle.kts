@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("com.github.freya022:JDA:d0f7834")
+    implementation("net.dv8tion:JDA:5.3.0")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
     implementation("com.google.guava:guava:33.2.1-jre")
     implementation("io.ktor:ktor-client-core:$ktor_version")

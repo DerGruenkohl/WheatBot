@@ -32,7 +32,7 @@ object ErrorHandler {
                 hook.editOriginal("")
                     .setEmbeds(
                         errorEmbed
-                            .setDescription("Failed to connect to the API")
+                            .setDescription("Failed to connect to the API, please try again later")
                             .setImage(getMeow())
                             .build()
                     ).queue()

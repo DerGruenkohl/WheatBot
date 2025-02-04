@@ -3,7 +3,9 @@ package commands
 import api.ApiInstance.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import listeners.Command
 import listeners.Option
@@ -20,6 +22,7 @@ import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.layers.points
 import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.y
+import share.ErrorHandler
 import share.Member
 import utils.getMeow
 import utils.getMinecraftUsername
@@ -37,57 +40,58 @@ import utils.getMinecraftUsername
     ]
 )
 class CompareUptime {
-     fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
+    suspend fun execute(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
         val hook = event.deferReply()
             .setEphemeral(ephemeral)
             .complete()
 
         var meow = getMeow()
-        if (meow == "-1"){meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"}
-        hook.editOriginal("").setEmbeds(
-            EmbedBuilder()
-                .setTitle("Please wait a moment")
-                .setImage(meow)
-                .build()
-        ).complete()
+        if (meow == "-1") {
+            meow = "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"
+        }
+        withContext(Dispatchers.IO) {
+            hook.editOriginal("").setEmbeds(
+                EmbedBuilder()
+                    .setTitle("Please wait a moment")
+                    .setImage(meow)
+                    .build()
+            ).complete()
+        }
         try {
+            val option = event.getOption("names")!!.asString
+            val members = option.split(",")
+                .map { ign ->
+                    client.request("uptime/player/$ign").body<Member>()
+                }
 
-            runBlocking {
-                val option = event.getOption("names")!!.asString
-                val members = option.split(",")
-                    .map { ign ->
-                        client.request("uptime/player/$ign").body<Member>()
-                    }
-
-                val frame = membersToDataFrame(members)
-                val plot =frame.plot {
-                    line {
-                        x("date")
-                        y("uptime")
-                        color("Players")
-                    }
-                    points {
-                        x("date")
-                        y("uptime")
-                        color("Players")
-                    }
-                    layout {
-                        y.axis.name = "Uptime in mins"
-                        title = "Uptime Comparison"
-                        theme = Theme.HIGH_CONTRAST_DARK
-                    }
-                }.toPNG()
-                hook.editOriginal("")
-                    .setAttachments(FileUpload.fromData(plot, "uptime.png"))
-                    .setEmbeds()
-                    .queue()
-            }
-        }catch (e: Exception){
-            e.printStackTrace()
-            hook.editOriginal("Something failed").queue()
+            val frame = membersToDataFrame(members)
+            val plot = frame.plot {
+                line {
+                    x("date")
+                    y("uptime")
+                    color("Players")
+                }
+                points {
+                    x("date")
+                    y("uptime")
+                    color("Players")
+                }
+                layout {
+                    y.axis.name = "Uptime in mins"
+                    title = "Uptime Comparison"
+                    theme = Theme.HIGH_CONTRAST_DARK
+                }
+            }.toPNG()
+            hook.editOriginal("")
+                .setAttachments(FileUpload.fromData(plot, "uptime.png"))
+                .setEmbeds()
+                .queue()
+        } catch (e: Exception) {
+            ErrorHandler.handle(e, hook)
         }
 
     }
+
     fun membersToDataFrame(members: List<Member>): AnyFrame {
         val months = mutableListOf<String>()
         val sales = mutableListOf<Int>()

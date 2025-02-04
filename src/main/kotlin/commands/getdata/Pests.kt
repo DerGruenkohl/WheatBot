@@ -59,29 +59,33 @@ class Pests {
         val type = event.getOption("type")?.asString ?: return ErrorHandler.handle("no type found", hook)
         val days = event.getOption("days")?.asInt ?: 0
 
-        val manager = TrackingManager(userID)
-        val link = manager.getSettings() ?: return ErrorHandler.handle("no settings found", hook)
+        try {
+            val manager = TrackingManager(userID)
+            val link = manager.getSettings() ?: return ErrorHandler.handle("no settings found", hook)
 
-        val settings = link.settings
-        if(!settings.track){hook.editOriginal("user has tracking disabled").queue(); return}
+            val settings = link.settings
+            if(!settings.track){hook.editOriginal("user has tracking disabled").queue(); return}
 
-        hook.editOriginal("getting data for ${getMinecraftUsername(link.uuid)}.").queue()
-        val tracking = manager.getTracking()
-        println("track1")
-        if (tracking.isEmpty()){
-            hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
-            return
+            hook.editOriginal("getting data for ${getMinecraftUsername(link.uuid)}.").queue()
+            val tracking = manager.getTracking()
+            println("track1")
+            if (tracking.isEmpty()){
+                hook.editOriginal("There is no tracked data for ${getMinecraftUsername(link.uuid)} yet").queue()
+                return
+            }
+
+            if (!settings.pestGain){hook.editOriginal("pest view disabled").queue(); return}
+            val plot = CollectionPlot(tracking, days)
+
+            val data = plot.createPestPlot(type).toPNG()
+
+            val upload = FileUpload.fromData(data, "$type.png")
+            hook.editOriginal("Here is your data:")
+                .setAttachments(upload)
+                .queue()
+        } catch (e: Exception) {
+            ErrorHandler.handle(e, hook)
         }
-
-        if (!settings.pestGain){hook.editOriginal("pest view disabled").queue(); return}
-        val plot = CollectionPlot(tracking, days)
-
-        val data = plot.createPestPlot(type).toPNG()
-
-        val upload = FileUpload.fromData(data, "$type.png")
-        hook.editOriginal("Here is your data:")
-            .setAttachments(upload)
-            .queue()
 
 
     }
