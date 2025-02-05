@@ -3,7 +3,7 @@ package com.dergruenkohl.share.data
 import io.ktor.util.logging.*
 import kotlinx.datetime.LocalDate
 import com.dergruenkohl.share.Member
-import com.dergruenkohl.GaussianFilter
+import com.dergruenkohl.utils.GaussianFilter
 import com.dergruenkohl.utils.getMinecraftUsername
 import java.awt.Color
 import java.awt.Font

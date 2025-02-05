@@ -1,4 +1,4 @@
-package com.dergruenkohl;
+package com.dergruenkohl.utils;
 
 import java.awt.*;
 import java.awt.image.*;

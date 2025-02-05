@@ -1,4 +1,4 @@
-package com.dergruenkohl;
+package com.dergruenkohl.utils;
 
 /*
  ** Copyright 2005 Huxtable.com. All rights reserved.

@@ -2,16 +2,15 @@ package com.dergruenkohl.listeners
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import com.dergruenkohl.utils.dsl.runAsync
+
 
 class ButtonManager: ListenerAdapter() {
     private val buttons = mutableListOf<IButton>()
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         buttons.forEach {
             if (it.id == event.componentId){
-                runAsync{
-                    it.execute(event)
-                }
+                //no need for async as this will die
+                it.execute(event)
                 return
             }
         }
