@@ -1,9 +1,9 @@
 package com.dergruenkohl.share
 
+import com.dergruenkohl.utils.getMinecraftUsername
 import io.ktor.util.logging.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
-import com.dergruenkohl.utils.getMinecraftUsername
 import java.awt.*
 import java.awt.font.TextAttribute
 import java.awt.geom.AffineTransform

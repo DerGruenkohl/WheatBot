@@ -1,11 +1,10 @@
 package com.dergruenkohl.share
 
+import com.dergruenkohl.utils.getMeow
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.interactions.InteractionHook
-import org.slf4j.Logger
-import com.dergruenkohl.utils.getMeow
 import java.awt.Color
 import java.net.ConnectException
 import javax.imageio.IIOException

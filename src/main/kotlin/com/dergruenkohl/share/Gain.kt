@@ -1,15 +1,14 @@
 package com.dergruenkohl.share
 
+import com.dergruenkohl.utils.getMinecraftUsername
 import io.ktor.util.logging.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
-import com.dergruenkohl.utils.getMinecraftUsername
 import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL

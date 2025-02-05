@@ -2,6 +2,9 @@ package com.dergruenkohl.share
 
 
 import com.dergruenkohl.api.ApiInstance
+import com.dergruenkohl.utils.getMinecraftUUID
+import com.dergruenkohl.utils.getMinecraftUsername
+import com.dergruenkohl.utils.getPairsInRange
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
@@ -11,9 +14,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
-import com.dergruenkohl.utils.getMinecraftUUID
-import com.dergruenkohl.utils.getMinecraftUsername
-import com.dergruenkohl.utils.getPairsInRange
 
 class Leaderboard {
     @Throws(Exception::class)

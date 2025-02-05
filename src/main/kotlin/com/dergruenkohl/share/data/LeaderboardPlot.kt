@@ -1,6 +1,7 @@
 package com.dergruenkohl.share.data
 
 
+import com.dergruenkohl.share.time
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -15,7 +16,6 @@ import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import com.dergruenkohl.share.time
 
 class LeaderboardPlot(val data: Map<Long, time>) {
     fun createPlot(): Plot {

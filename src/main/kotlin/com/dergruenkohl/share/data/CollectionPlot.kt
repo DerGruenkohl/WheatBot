@@ -3,6 +3,11 @@ package com.dergruenkohl.share.data
 
 
 
+import com.dergruenkohl.share.Collections
+import com.dergruenkohl.share.CropWeight
+import com.dergruenkohl.share.Player
+import com.dergruenkohl.share.UncountedCrops
+import com.dergruenkohl.utils.getMinecraftUsername
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -17,11 +22,6 @@ import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import com.dergruenkohl.share.Collections
-import com.dergruenkohl.share.CropWeight
-import com.dergruenkohl.share.Player
-import com.dergruenkohl.share.UncountedCrops
-import com.dergruenkohl.utils.getMinecraftUsername
 import kotlin.reflect.full.memberProperties
 
 class CollectionPlot(val playerData: List<Player>, var days: Int) {

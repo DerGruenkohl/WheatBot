@@ -1,6 +1,7 @@
 package com.dergruenkohl.share
 
 import com.dergruenkohl.api.ApiInstance.client
+import com.dergruenkohl.utils.getMinecraftUsername
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.datetime.LocalDate
@@ -16,7 +17,6 @@ import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import com.dergruenkohl.utils.getMinecraftUsername
 import java.time.temporal.WeekFields
 import java.util.*
 
