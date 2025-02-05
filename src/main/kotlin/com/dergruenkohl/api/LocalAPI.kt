@@ -1,7 +1,5 @@
 package com.dergruenkohl.api
 
-import com.dergruenkohl.ConfigObj.apiUrl
-import com.dergruenkohl.ConfigObj.key
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*

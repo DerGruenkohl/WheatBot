@@ -36,6 +36,7 @@ dependencies {
     implementation("com.h2database:h2:2.3.232")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
 
     //HTTP
     implementation("io.ktor:ktor-client-core:$ktor_version")
