@@ -1,13 +1,13 @@
 package com.dergruenkohl.utils
 
-import com.dergruenkohl.api.ApiInstance
+import com.dergruenkohl.api.client
+import dev.minn.jda.ktx.messages.Embed
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import net.dv8tion.jda.api.entities.MessageEmbed
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -17,15 +17,16 @@ data class MojangResponse(
     val name: String,
     val id: String
 )
-
-fun getMinecraftUsername(uuid: String): String = runBlocking {
-    ApiInstance.client.request("https://mowojang.matdoes.dev/$uuid").body<MojangResponse>().name
-    }
-
-@Throws(IOException::class)
-fun getMinecraftUUID(name: String): String = runBlocking {
-    ApiInstance.client.request("https://mowojang.matdoes.dev/$name").body<MojangResponse>().id
+private val logger = KotlinLogging.logger {}
+private suspend fun getMojangResponse(identifier: String): MojangResponse {
+    logger.info { "Getting Mojang response for $identifier" }
+    return client.get("https://mowojang.matdoes.dev/$identifier").body<MojangResponse>()
 }
+
+suspend fun getMinecraftUsername(uuid: String): String = getMojangResponse(uuid).name
+
+suspend fun getMinecraftUUID(name: String): String = getMojangResponse(name).id
+
 fun <K, V> getPairsInRange(map: Map<K, V>, startIndex: Int, range: Int = 10): List<Pair<K, V>> {
     // Convert map entries to a list
     val entriesList = map.entries.toList()
@@ -38,6 +39,12 @@ fun <K, V> getPairsInRange(map: Map<K, V>, startIndex: Int, range: Int = 10): Li
         emptyList()
     }
 }
+fun getLoading(): MessageEmbed = Embed {
+    title = "Loading..."
+    description = "Please wait a bit"
+    image = getMeow()
+}
+
 fun getMeow() : String{
     // The Cat API endpoint for random cat images
     val apiUrl = "https://api.thecatapi.com/v1/images/search"

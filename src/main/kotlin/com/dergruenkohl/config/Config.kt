@@ -45,11 +45,14 @@ data class Config(
         private val logger = KotlinLogging.logger { }
 
         private val configFilePath: Path = Environment.configFolder.resolve("config.json")
-
+        private val json = Json{
+            ignoreUnknownKeys = true
+        }
         @get:BService
         val instance: Config by lazy {
             logger.info { "Loading configuration at ${configFilePath.absolutePathString()}" }
-            return@lazy Json.decodeFromString<Config>(configFilePath.readText())
+
+            return@lazy json.decodeFromString<Config>(configFilePath.readText())
         }
     }
 }

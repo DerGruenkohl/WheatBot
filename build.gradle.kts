@@ -15,11 +15,8 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven("https://m2.duncte123.dev/releases")
-    maven("https://packages.jetbrains.team/maven/p/kds/kotlin-ds-maven")
-    maven ("https://m2.chew.pro/snapshots")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://jitpack.io")
-    maven("https://repo.kotlin.link")
 }
 
 dependencies {
@@ -37,23 +34,22 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
 
     //HTTP
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
-    implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
 
     //PLOTTING
-    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.6.0")
-    implementation("org.jetbrains.kotlinx:kotlin-statistics-jvm:0.2.1")
+    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.7.1")
 
     //UTILS
-    implementation("com.google.guava:guava:33.2.1-jre")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("dev.reformator.stacktracedecoroutinator:stacktrace-decoroutinator-jvm:2.4.8")
+    implementation("io.github.dergruenkohl:Hypixel-Kotlin:0.1.5")
 
 }
 
@@ -72,6 +68,7 @@ kotlin{
         freeCompilerArgs.add("-Xcontext-receivers")
     }
 }
+
 
 application {
     mainClass.set("com.dergruenkohl.MainKt")

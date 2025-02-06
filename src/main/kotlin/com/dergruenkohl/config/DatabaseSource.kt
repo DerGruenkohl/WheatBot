@@ -1,5 +1,7 @@
 package com.dergruenkohl.config
 
+import com.dergruenkohl.utils.database.GuildRepo
+import com.dergruenkohl.utils.database.LinkRepo
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.freya022.botcommands.api.core.db.HikariSourceSupplier
@@ -12,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 private val logger = KotlinLogging.logger { }
 
 // Interfaced service used to retrieve an SQL Connection
-@BService
+@BService()
 class DatabaseSource(config: Config) : HikariSourceSupplier {
     override val source = HikariDataSource(HikariConfig().apply {
         jdbcUrl = config.databaseConfig.h2Url
@@ -21,22 +23,30 @@ class DatabaseSource(config: Config) : HikariSourceSupplier {
         // Emits a warning and does a thread/coroutine dump after the duration
         leakDetectionThreshold = 10.seconds.inWholeMilliseconds
     })
+    private val source2 = HikariDataSource(HikariConfig().apply {
+        jdbcUrl = config.mainDatabase.mysqlUrl
+        username = config.mainDatabase.user
+        password = config.mainDatabase.password
+        maximumPoolSize = 2
+        leakDetectionThreshold = 10.seconds.inWholeMilliseconds
+    })
 
     init {
+        Database.connect(
+            source2
+        )
+        GuildRepo
+
         //Migrate BC tables
         createFlyway("bc", "bc_database_scripts").migrate()
 
         //You can use the same function for your database, you have to change the schema and scripts location
         createFlyway("public", "wiki_database_scripts").migrate()
 
-        logger.info { "Created database source, creating MariaDB connection" }
-        Database.connect(
-            url = config.mainDatabase.mysqlUrl,
-            user = config.mainDatabase.user,
-            password = config.mainDatabase.password
-        )
+        logger.info { "Created database source" }
 
     }
+
     private fun createFlyway(schema: String, scriptsLocation: String): Flyway = Flyway.configure()
         .dataSource(source)
         .schemas(schema)
