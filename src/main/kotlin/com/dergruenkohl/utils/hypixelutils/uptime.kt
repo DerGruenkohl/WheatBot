@@ -48,4 +48,7 @@ data class Time(
     override fun toString(): String {
         return "${this.hours}h, ${this.mins}m"
     }
+    fun toMinutes(): Int {
+        return this.hours * 60 + this.mins
+    }
 }

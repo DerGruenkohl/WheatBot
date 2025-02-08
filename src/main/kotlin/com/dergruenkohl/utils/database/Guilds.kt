@@ -18,6 +18,7 @@ import kotlinx.serialization.serializer
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -40,11 +41,20 @@ class GuildEntity(id: EntityID<Long>) : LongEntity(id) {
             membersJson = json.encodeToString(ListSerializer(Member.serializer()), value)
         }
 }
+class LbHistoryEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<LbHistoryEntity>(LbHistoryTable)
+    var timestamp by LbHistoryTable.timestamp
+    var time by LbHistoryTable.time
+}
 
 object GuildTable : LongIdTable() {
     val guildId = text("guildId").uniqueIndex()
     val lastUpdated = long("lastUpdated")
     val members: Column<String> = text("members")
+}
+object LbHistoryTable : LongIdTable("lb_history") {
+    val timestamp: Column<Long> = long("timestamp")
+    val time = json("time", json, Time.serializer())
 }
 
 object GuildRepo {
@@ -53,6 +63,7 @@ object GuildRepo {
     init {
         transaction {
             SchemaUtils.create(GuildTable)
+            SchemaUtils.create(LbHistoryTable)
         }
     }
 
@@ -93,10 +104,17 @@ object GuildRepo {
         val guilds = getGuildsToUpdate()
         logger.info { "Updating ${guilds.size} guilds" }
         guilds.forEach {
-            val guild = hypixelClient.getGuildById(it).guild?: return logger.warn { "Failed to get guild for ID $it" }
+            val guild = hypixelClient.getGuildById(it).guild?: return clearGuild(it)
             // Don't get rate limited
             delay(30.seconds)
             guild.save()
+        }
+    }
+    private fun clearGuild(guildId: String){
+        logger.warn { "Couldnt find guild $guildId on hypixel, removing members from the database" }
+        transaction {
+            val guild = GuildEntity.find { GuildTable.guildId eq guildId }.firstOrNull()?: return@transaction
+            guild.members = emptyList()
         }
     }
 

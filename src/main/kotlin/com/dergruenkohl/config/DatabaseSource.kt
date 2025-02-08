@@ -1,7 +1,6 @@
 package com.dergruenkohl.config
 
 import com.dergruenkohl.utils.database.GuildRepo
-import com.dergruenkohl.utils.database.LinkRepo
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.freya022.botcommands.api.core.db.HikariSourceSupplier

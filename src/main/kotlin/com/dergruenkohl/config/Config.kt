@@ -1,6 +1,7 @@
 package com.dergruenkohl.config
 
 
+import com.dergruenkohl.hypixel.client.HypixelClient
 import io.github.freya022.botcommands.api.core.service.annotations.BService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable
@@ -43,6 +44,7 @@ data class Config(
 
     companion object {
         private val logger = KotlinLogging.logger { }
+
 
         private val configFilePath: Path = Environment.configFolder.resolve("config.json")
         private val json = Json{
