@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag
 
 @BService
 class Bot(private val config: Config) : JDAService() {
-    override val intents: Set<GatewayIntent> = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS)
+    override val intents: Set<GatewayIntent> = enumSetOf()
     override val cacheFlags: Set<CacheFlag> = enumSetOf()
     override fun createJDA(event: BReadyEvent, eventManager: IEventManager) {
         default(
