@@ -1,15 +1,17 @@
 package com.dergruenkohl.utils.calculators
 
 import com.dergruenkohl.api.hypixelClient
-import com.dergruenkohl.hypixel.client.getSelectedProfileMember
-import hypixel.data.profile.ProfileMember
-import hypixel.data.profile.Skills
+import com.dergruenkohl.hypixel.client.getProfileMember
+import com.dergruenkohl.utils.database.Link
+import com.dergruenkohl.hypixel.data.profile.ProfileMember
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-class ProfileCalculator(private val uuid: String) {
-    val pestDrops = mapOf(
+class ProfileCalculator(private val link: Link) {
+    private val logger = KotlinLogging.logger {  }
+    private val pestDrops = mapOf(
         "mite" to 16_722.29,
         "cricket" to 27_637.94,
         "moth" to 24_422.40,
@@ -21,7 +23,7 @@ class ProfileCalculator(private val uuid: String) {
         "mosquito" to 16_722.29,
         "fly" to 8_361.14,
     )
-    val removedCollection = mapOf(
+    private val removedCollection = mapOf(
         "mite" to 1_778.36,
         "cricket" to 2_554.51,
         "moth" to 1_284.30,
@@ -62,7 +64,11 @@ class ProfileCalculator(private val uuid: String) {
     private var data: ProfileMember? = null
     private suspend fun getData(){
         if (data != null) return
-        data = hypixelClient.getSelectedProfileMember(uuid)
+        try {
+            data = hypixelClient.getProfileMember(link.uuid, link.settings.profileID)
+        } catch (e: Exception) {
+            logger.warn { e }
+        }
     }
 
     private suspend fun getCollectionData(): Map<String, Double>? {

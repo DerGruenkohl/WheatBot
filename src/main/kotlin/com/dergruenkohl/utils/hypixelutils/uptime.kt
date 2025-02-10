@@ -1,7 +1,7 @@
 package com.dergruenkohl.utils.hypixelutils
 
 
-import hypixel.data.guild.Member
+import com.dergruenkohl.hypixel.data.guild.Member
 
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
@@ -20,6 +20,12 @@ fun Member.getFarmingUptime(): LinkedHashMap<String, Time>{
         newMap[it.key] = pair
     }
     return newMap
+}
+fun Member.getLastUptimeEntry(): Pair<Int, Time> {
+    val map = this.getFarmingUptime()
+    val last = map.entries.last()
+    val date = LocalDate.parse(last.key, DateTimeFormatter.ISO_DATE)
+    return Pair(date.toEpochDay().toInt(), last.value)
 }
 
 fun Member.getAverageUptime(): Time {

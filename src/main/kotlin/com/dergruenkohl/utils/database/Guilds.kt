@@ -4,30 +4,27 @@ import com.dergruenkohl.api.hypixelClient
 import com.dergruenkohl.hypixel.client.getGuildById
 import com.dergruenkohl.utils.hypixelutils.Time
 import com.dergruenkohl.utils.hypixelutils.getAverageUptime
-import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
-import hypixel.data.guild.Guild
-import hypixel.data.guild.Member
+import com.dergruenkohl.hypixel.data.guild.Guild
+import com.dergruenkohl.hypixel.data.guild.Member
+import com.dergruenkohl.utils.database.UptimeRepo.save
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.serialization.InternalSerializationApi
+import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.json.json
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.time.Duration.Companion.seconds
 
-private val json = Json { prettyPrint = true }
 
 class GuildEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<GuildEntity>(GuildTable)
@@ -36,9 +33,9 @@ class GuildEntity(id: EntityID<Long>) : LongEntity(id) {
     var lastUpdated by GuildTable.lastUpdated
 
     var members: List<Member>
-        get() = json.decodeFromString(ListSerializer(Member.serializer()), membersJson)
+        get() = Json.decodeFromString(ListSerializer(Member.serializer()), membersJson)
         set(value) {
-            membersJson = json.encodeToString(ListSerializer(Member.serializer()), value)
+            membersJson = Json.encodeToString(ListSerializer(Member.serializer()), value)
         }
 }
 class LbHistoryEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -54,7 +51,7 @@ object GuildTable : LongIdTable() {
 }
 object LbHistoryTable : LongIdTable("lb_history") {
     val timestamp: Column<Long> = long("timestamp")
-    val time = json("time", json, Time.serializer())
+    val time = json("time", Json, Time.serializer())
 }
 
 object GuildRepo {
@@ -104,17 +101,21 @@ object GuildRepo {
         val guilds = getGuildsToUpdate()
         logger.info { "Updating ${guilds.size} guilds" }
         guilds.forEach {
-            val guild = hypixelClient.getGuildById(it).guild?: return clearGuild(it)
-            // Don't get rate limited
-            delay(30.seconds)
-            guild.save()
+            try {
+                val guild = hypixelClient.getGuildById(it).guild?: return@forEach clearGuild(it)
+                // Don't get rate limited
+                //delay(30.seconds)
+                guild.save()
+            } catch (e: Exception) {
+                clearGuild(it)
+            }
         }
     }
     private fun clearGuild(guildId: String){
         logger.warn { "Couldnt find guild $guildId on hypixel, removing members from the database" }
         transaction {
-            val guild = GuildEntity.find { GuildTable.guildId eq guildId }.firstOrNull()?: return@transaction
-            guild.members = emptyList()
+            val guild = GuildEntity.find { GuildTable.guildId eq guildId }.firstOrNull()?: return@transaction logger.error { "Guild $guildId not found in the database" }
+            guild.delete()
         }
     }
 
@@ -131,6 +132,12 @@ object GuildRepo {
         val members = this.members
         val saved = transaction {
             GuildEntity.find { GuildTable.guildId.eq (guildId) }.firstOrNull()
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            logger.info { "Saving ${members.size} members" }
+            members.forEach {
+                it.save()
+            }
         }
         if (saved == null){
             transaction {

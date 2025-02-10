@@ -1,20 +1,21 @@
 package com.dergruenkohl.commands.uptime
 
 import com.dergruenkohl.api.hypixelClient
-import com.dergruenkohl.config.Config
-import com.dergruenkohl.hypixel.client.HypixelClient
+import com.dergruenkohl.config.Data
 import com.dergruenkohl.hypixel.client.getGuildByPlayer
 import com.dergruenkohl.utils.GaussianFilter
 import com.dergruenkohl.utils.database.GuildRepo.save
 import com.dergruenkohl.utils.getMinecraftUUID
-import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
-import hypixel.data.guild.Member
+import com.dergruenkohl.hypixel.data.guild.Member
+import com.dergruenkohl.utils.database.Link
+import dev.minn.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDate
+import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -24,41 +25,77 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import java.io.File
 import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
 import kotlin.math.floor
 private val logger = KotlinLogging.logger{}
-
-suspend fun getUptime(ign: String): BufferedImage? {
+private val scope = CoroutineScope(Dispatchers.IO)
+suspend fun getUptime(ign: String, link: Link?): BufferedImage? {
     logger.info { "Getting uptime for $ign" }
     val uuid = getMinecraftUUID(ign)
     val guild = hypixelClient.getGuildByPlayer(uuid).guild?: return null
-    guild.save()
+    scope.launch {
+        guild.save()
+    }
     val member = guild.members.find { it.uuid == uuid }?: return null
-    return ImageGen(member, ign).createImage()
+    return ImageGen(member, ign, link).createImage()
+}
+suspend fun getUptime(ign: String): Member? {
+    logger.info { "Getting uptime for $ign" }
+    val uuid = getMinecraftUUID(ign)
+    val guild = hypixelClient.getGuildByPlayer(uuid).guild?: return null
+    scope.launch {
+        guild.save()
+    }
+    val member = guild.members.find { it.uuid == uuid }?: return null
+    return member
 }
 
-private class ImageGen(private val member: Member, private val ign: String){
+private class ImageGen(private val member: Member, private val ign: String, private val link: Link?){
     private val width = 530
     private val height = 450
     private val font by lazy {
         val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
         Font.createFont(Font.TRUETYPE_FONT, boldFont)
     }
-    private val color = Color.WHITE
     private val logger = KotlinLogging.logger{ }
+
+    private val color = if (link?.settings?.textColor is String){
+        try {
+            Color.decode("#${link.settings.textColor}")
+        } catch (e: Exception) {
+            logger.warn { "Failed to decode ${link.settings.textColor}, falling back to white" }
+            Color.WHITE
+        }
+    }else{
+        Color.WHITE
+    }
+
 
     private suspend fun setUpImage(): BufferedImage{
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        val imageUrl = URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg")
+        val imageUrl = if(link?.settings?.customImage == true){
+            try {
+                Data.folder.resolve("images/${link.discordId}.png").toUri().toURL()
+            } catch (e: Exception) {
+                logger.warn { "Failed to get custom image, falling back to default" }
+                URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg")
+            }
+        }else{
+            URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg")
+        }
+
         val g: Graphics2D = image.createGraphics()
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
         val wheatImage = withContext(Dispatchers.IO) {
-            ImageIO.read(imageUrl)
+            try {
+                ImageIO.read(imageUrl)
+            } catch (e: Exception) {
+                ImageIO.read(URL("https://www.bakingbusiness.com/ext/resources/2022/05/17/crop-progress_wheat_AdobeStock_LEAD.jpeg"))
+            }
         }
         val filter = GaussianFilter()
         filter.radius = 7f
@@ -126,7 +163,7 @@ private class ImageGen(private val member: Member, private val ign: String){
                 ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${member.uuid}/full"))
             }
         }catch (e: IIOException){
-            logger.info("Failed to get skin from starlight, falling back to crafatar")
+            logger.info { "Failed to get skin from starlight, falling back to crafatar" }
 
             skin = withContext(Dispatchers.IO) {
                 ImageIO.read(URL("https://crafatar.com/renders/body/${member.uuid}"))
@@ -155,6 +192,7 @@ private class ImageGen(private val member: Member, private val ign: String){
         scaleOp.filter(skin, after)
         return after
     }
+    
 
     suspend fun createImage(): BufferedImage {
         val image = setUpImage()
@@ -165,7 +203,6 @@ private class ImageGen(private val member: Member, private val ign: String){
         drawTitles(g)
         drawUptime(g)
         g.drawImage(getSkin(), 350, 50, null)
-
         g.dispose()
         return image
 

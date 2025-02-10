@@ -1,5 +1,6 @@
 package com.dergruenkohl.utils
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*
 import net.dv8tion.jda.api.EmbedBuilder

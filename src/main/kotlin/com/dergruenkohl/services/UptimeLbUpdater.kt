@@ -8,8 +8,12 @@ import io.github.freya022.botcommands.api.core.service.annotations.BService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlin.math.floor
+import kotlin.time.Duration.Companion.seconds
 
 @BService
 object UptimeLbUpdater {
@@ -20,17 +24,23 @@ object UptimeLbUpdater {
         scope.scheduleRepeating(15, 60, TimeUnit.MINUTES){
             GuildRepo.updateGuilds()
         }
-        scope.scheduleRepeating(30, 2000, TimeUnit.SECONDS){
+        scope.scheduleRepeating(0, 1, TimeUnit.DAYS){
+            delay(30.seconds)
             val lb = GuildRepo.getTopMembersByFarmingUptime(1)
             val average = lb.map { it.second.toMinutes() }.average()
             val avgHours = floor(average / 60).toInt()
             val mins = (average % 60).toInt()
             logger.info { "Average farming uptime: $avgHours hours, $mins minutes" }
             val time = Time(avgHours, mins)
-            LbHistoryEntity.new {
-                this.time = time
-                this.timestamp = System.currentTimeMillis()
+            transaction {
+                val canInsert = LbHistoryEntity.all().none { it.time == time }
+                if(!canInsert) return@transaction logger.info { "Already inserted for today" }
+                LbHistoryEntity.new {
+                    this.time = time
+                    this.timestamp = LocalDate.now().toEpochDay()
+                }
             }
+
         }
     }
 }

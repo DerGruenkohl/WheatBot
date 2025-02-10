@@ -14,10 +14,15 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.castTo
+import org.jetbrains.exposed.sql.json.JsonColumnType
 import org.jetbrains.exposed.sql.json.json
 import org.jetbrains.exposed.sql.transactions.transaction
 
-private val json = Json { prettyPrint = true }
+private val json = Json {
+    encodeDefaults = true
+}
 
 data class Link (
     val uuid: String,
@@ -47,7 +52,7 @@ data class Settings(
     val track: Boolean = false,
     val customImage: Boolean = false,
     val textColor: String? = null,
-    val profileID: String= runBlocking { hypixelClient.getSelectedProfileID(uuid) ?: "invalid profile" }
+    val profileID: String
 )
 class LinkEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<LinkEntity>(LinkTable)
@@ -119,5 +124,11 @@ object LinkRepo{
                 this.settings = settings
             }
         }
+    }
+
+    fun getAllTrack(): List<Link> = transaction {
+        LinkEntity.all()
+            .map { it.toLink() }
+            .filter { it.settings.track }
     }
 }

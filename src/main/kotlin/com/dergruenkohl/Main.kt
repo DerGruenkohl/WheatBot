@@ -4,6 +4,7 @@ import ch.qos.logback.classic.ClassicConstants
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.util.ContextInitializer
 import com.dergruenkohl.config.Config
+import com.dergruenkohl.config.Data
 import com.dergruenkohl.config.Environment
 import dev.reformator.stacktracedecoroutinator.jvm.DecoroutinatorJvmApi
 import io.github.freya022.botcommands.api.commands.application.provider.GlobalApplicationCommandManager
@@ -52,7 +53,7 @@ fun main(args: Array<out String>) {
             applicationCommands {
                 @OptIn(DevConfig::class)
                 disableAutocompleteCache = Environment.isDev
-                fileCache {
+                fileCache(Data.folder) {
                     @OptIn(DevConfig::class)
                     checkOnline = Environment.isDev
                 }

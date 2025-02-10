@@ -2,6 +2,7 @@ package com.dergruenkohl.commands
 
 import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.database.GuildRepo
+import com.dergruenkohl.utils.database.LbHistoryEntity
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.getMinecraftUsername
@@ -25,7 +26,20 @@ import io.github.freya022.botcommands.api.modals.annotations.ModalInput
 import io.github.freya022.botcommands.api.modals.create
 import io.github.freya022.botcommands.api.modals.shortTextInput
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.datetime.LocalDate
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.utils.FileUpload
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.kotlinx.kandy.dsl.plot
+import org.jetbrains.kotlinx.kandy.letsplot.export.toPNG
+import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
+import org.jetbrains.kotlinx.kandy.letsplot.layers.line
+import org.jetbrains.kotlinx.kandy.letsplot.layers.points
+import org.jetbrains.kotlinx.kandy.letsplot.settings.Symbol
+import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
+import org.jetbrains.kotlinx.kandy.letsplot.x
+import org.jetbrains.kotlinx.kandy.letsplot.y
+import org.jetbrains.kotlinx.kandy.util.color.Color
 import kotlin.time.Duration.Companion.minutes
 
 @Command
@@ -145,9 +159,47 @@ class UptimeLB(private val buttons: Buttons, private val modals: Modals): Applic
                 bindWith(::searchForIGN)
             },
             buttons.primary("get averages").persistent {
+                bindWith(::getAverages)
             }
         )
     )
+    @JDAButtonListener
+    suspend fun getAverages(event: ButtonEvent){
+        val hook = event.deferReply().await()
+        val averages = transaction {
+            LbHistoryEntity.all().associate { it.timestamp to it.time }
+        }
+        val timestamps = averages.keys.map {
+            LocalDate.fromEpochDays(it.toInt()).toString()
+        }
+        val yValues = averages.values.map { it.toMinutes() }
+        val plot = plot {
+            x(averages.keys)
+            y(yValues)
+            points {
+                size = 3.5
+                symbol = Symbol.BULLET
+                this.color = Color.BLUE
+            }
+            line {
+                this.color = Color.BLUE
+            }
+
+            layout{
+                title = "Uptime Leaderboard average"
+                theme = Theme.HIGH_CONTRAST_DARK
+                x.axis.name = "Date"
+                y.axis.name = "Average Uptime from the top 10"
+                x.axis.breaksLabeled(averages.keys.toList(), timestamps)
+                y.axis.breaksLabeled(yValues, averages.values.map { it.toString() })
+                //y.limits = values.first()..values.last()
+            }
+        }.toPNG()
+
+        hook.editOriginal("")
+            .setFiles(FileUpload.fromData(plot, "plot.png"))
+            .queue()
+    }
 
 
 }

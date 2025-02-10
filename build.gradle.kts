@@ -44,12 +44,13 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
 
     //PLOTTING
-    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.7.1")
+    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.8.0")
+    implementation("org.jetbrains.kotlinx:kandy-api:0.8.0")
 
     //UTILS
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("dev.reformator.stacktracedecoroutinator:stacktrace-decoroutinator-jvm:2.4.8")
-    implementation("io.github.dergruenkohl:Hypixel-Kotlin:0.2.3")
+    implementation("io.github.dergruenkohl:Hypixel-Kotlin:b302d47f03")
 
 }
 

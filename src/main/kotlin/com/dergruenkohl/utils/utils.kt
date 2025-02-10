@@ -5,12 +5,17 @@ import dev.minn.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.datetime.Clock
+
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 
 @Serializable
 data class MojangResponse(
@@ -18,9 +23,25 @@ data class MojangResponse(
     val id: String
 )
 private val logger = KotlinLogging.logger {}
+private val cache = ConcurrentHashMap<String, CachedMojangResponse>()
+
+private data class CachedMojangResponse(
+    val response: MojangResponse,
+    val timestamp: Instant
+)
+
 private suspend fun getMojangResponse(identifier: String): MojangResponse {
+    val now = Instant.now()
+    val cachedResponse = cache[identifier]
+
+    if (cachedResponse != null && Duration.between(cachedResponse.timestamp, now).toHours() < 1) {
+        return cachedResponse.response
+    }
+
     logger.info { "Getting Mojang response for $identifier" }
-    return client.get("https://mowojang.matdoes.dev/$identifier").body<MojangResponse>()
+    val response = client.get("https://mowojang.matdoes.dev/$identifier").body<MojangResponse>()
+    cache[identifier] = CachedMojangResponse(response, now)
+    return response
 }
 
 suspend fun getMinecraftUsername(uuid: String): String = getMojangResponse(uuid).name
