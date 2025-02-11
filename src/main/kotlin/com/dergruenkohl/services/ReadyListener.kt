@@ -7,8 +7,7 @@ import io.github.freya022.botcommands.api.core.annotations.BEventListener
 import io.github.freya022.botcommands.api.core.service.annotations.BService
 import io.github.freya022.botcommands.api.core.utils.retrieveUserByIdOrNull
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.time.Duration.Companion.seconds
@@ -27,7 +26,7 @@ class ReadyListener {
         logger.info { "Bot connected as ${jda.selfUser.name}" }
         logger.info { "The bot is present on these guilds :" }
         for (guild in jda.guildCache) {
-            logger.info { "\t- ${guild.name} (${guild.id}) members: ${guild.loadMembers().get().size}" }
+            logger.info { "\t- ${guild.name} (${guild.id})" }
         }
     }
 

@@ -111,7 +111,7 @@ private class ImageGen(private val member: Member, private val ign: String, priv
         g.fill(rect)
         g.color = color
     }
-    private suspend fun drawTitles(g: Graphics2D){
+    private fun drawTitles(g: Graphics2D){
 
         g.font = font.deriveFont(32f)
             .deriveFont(mapOf(TextAttribute.UNDERLINE to TextAttribute.UNDERLINE_ON))
