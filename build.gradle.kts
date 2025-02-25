@@ -50,7 +50,7 @@ dependencies {
     //UTILS
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("dev.reformator.stacktracedecoroutinator:stacktrace-decoroutinator-jvm:2.4.8")
-    implementation("io.github.dergruenkohl:Hypixel-Kotlin:b302d47f03")
+    implementation("io.github.dergruenkohl:Hypixel-Kotlin:0.3.0")
 
 }
 

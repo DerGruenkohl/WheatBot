@@ -23,6 +23,8 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.json.json
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -104,7 +106,7 @@ object GuildRepo {
             try {
                 val guild = hypixelClient.getGuildById(it).guild?: return@forEach clearGuild(it)
                 // Don't get rate limited
-                //delay(30.seconds)
+                delay(Random.nextLong(30, 91).seconds)
                 guild.save()
             } catch (e: Exception) {
                 clearGuild(it)
@@ -120,7 +122,7 @@ object GuildRepo {
     }
 
     private fun getGuildsToUpdate(): List<String> {
-        val sixHoursAgo = System.currentTimeMillis() - 6 * 60 * 60 * 1000
+        val sixHoursAgo = System.currentTimeMillis() - 36.hours.inWholeMilliseconds
         return transaction {
             GuildEntity.find { GuildTable.lastUpdated lessEq sixHoursAgo }
                 .map { it.guildId }

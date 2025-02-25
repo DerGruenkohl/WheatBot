@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @BService
@@ -30,7 +31,7 @@ object TrackingUpdater {
                 } catch (e: Exception) {
                     logger.warn { e }
                 }
-                delay(30.seconds)
+                delay(Random.nextLong(30, 300).seconds)
             }
         }
     }
