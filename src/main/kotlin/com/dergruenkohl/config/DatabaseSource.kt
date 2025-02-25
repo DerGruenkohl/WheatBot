@@ -26,14 +26,12 @@ class DatabaseSource(config: Config) : HikariSourceSupplier {
         jdbcUrl = config.mainDatabase.mysqlUrl
         username = config.mainDatabase.user
         password = config.mainDatabase.password
-        maximumPoolSize = 2
+        maximumPoolSize = 50
         leakDetectionThreshold = 10.seconds.inWholeMilliseconds
     })
 
     init {
-        Database.connect(
-            source2
-        )
+        Database.connect(source2)
         GuildRepo
 
         //Migrate BC tables
