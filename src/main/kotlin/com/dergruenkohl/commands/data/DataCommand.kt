@@ -119,7 +119,7 @@ object DataCommand : ApplicationCommand() {
             }
 
             val ign = getMinecraftUsername(link.uuid)
-            val plot = createPlot(data, "Weight gain graph for $ign", "weight").toPNG()
+            val plot = getCachedPlot(data, "Weight gain graph for $ign", "weight").toPNG()
             hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(plot, "plot.png")).queue()
@@ -160,7 +160,7 @@ object DataCommand : ApplicationCommand() {
                 return hook.editOriginal("${user.name} has no tracked data").queue()
             }
             val ign = getMinecraftUsername(link.uuid)
-            val plot = createPlot(data, "$collection collection graph for $ign", collection).toPNG()
+            val plot = getCachedPlot(data, "$collection collection graph for $ign", collection).toPNG()
             hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(plot, "plot.png")).queue()
@@ -198,7 +198,7 @@ object DataCommand : ApplicationCommand() {
                 return hook.editOriginal("${user.name} has no tracked data").queue()
             }
             val ign = getMinecraftUsername(link.uuid)
-            val plot = createPlot(data, "$collection pest collection graph for $ign", collection).toPNG()
+            val plot = getCachedPlot(data, "$collection pest collection graph for $ign", collection).toPNG()
             hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(plot, "plot.png")).queue()
@@ -235,7 +235,7 @@ object DataCommand : ApplicationCommand() {
                 return hook.editOriginal("${user.name} has no tracked data").queue()
             }
             val ign = getMinecraftUsername(link.uuid)
-            val plot = createPlot(data, "$collection xp graph for $ign", collection).toPNG()
+            val plot = getCachedPlot(data, "$collection xp graph for $ign", collection).toPNG()
             hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(plot, "plot.png")).queue()
@@ -275,7 +275,7 @@ object DataCommand : ApplicationCommand() {
                 return hook.editOriginal("${user.name} has no tracked data").queue()
             }
             val ign = getMinecraftUsername(link.uuid)
-            val plot = createPlot(data, "$collection collection graph for $ign", collection).toPNG()
+            val plot = getCachedPlot(data, "$collection collection graph for $ign", collection).toPNG()
             hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(plot, "plot.png")).queue()

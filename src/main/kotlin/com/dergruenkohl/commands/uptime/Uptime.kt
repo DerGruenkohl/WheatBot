@@ -45,7 +45,7 @@ object Uptime: ApplicationCommand() {
                 description = "You need to provide a minecraft name or link your account"
             }).queue())
 
-            val uptime = getUptime(ign, link)?: return event.hook.editOriginalEmbeds(Embed {
+            val uptime = getCachedUptime(ign, link) ?: return event.hook.editOriginalEmbeds(Embed {
                 title = "Error"
                 description = "Could not get uptime for $name"
             }).queue()

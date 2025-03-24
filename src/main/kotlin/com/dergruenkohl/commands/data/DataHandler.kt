@@ -1,9 +1,7 @@
 package com.dergruenkohl.commands.data
 
-import kotlinx.datetime.Instant
+import io.github.reactivecircus.cache4k.Cache
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.kotlinx.kandy.dsl.continuous
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.ir.Plot
@@ -15,7 +13,15 @@ import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
+import kotlin.time.Duration.Companion.minutes
 
+private val cache = Cache.Builder<String, Plot>()
+    .expireAfterWrite(60.minutes)
+    .build()
+
+suspend fun getCachedPlot(data: Map<Long, Number>, plotTitle: String, type: String): Plot{
+    return cache.get(plotTitle + type+ data.keys.size) { createPlot(data, plotTitle, type) }
+}
 
 fun createPlot(data: Map<Long, Number>, plotTitle: String, type: String): Plot{
     val data = data.filter { it.value.toLong() > 0 }

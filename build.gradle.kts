@@ -51,6 +51,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("dev.reformator.stacktracedecoroutinator:stacktrace-decoroutinator-jvm:2.4.8")
     implementation("io.github.dergruenkohl:Hypixel-Kotlin:0.3.0")
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.14.0")
 
 }
 

@@ -9,13 +9,12 @@ import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
 import com.dergruenkohl.hypixel.data.guild.Member
 import com.dergruenkohl.utils.database.Link
-import dev.minn.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -29,8 +28,24 @@ import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
 import kotlin.math.floor
+import kotlin.time.Duration.Companion.minutes
+
 private val logger = KotlinLogging.logger{}
 private val scope = CoroutineScope(Dispatchers.IO)
+private val cache = Cache.Builder<String, BufferedImage>()
+    .expireAfterWrite(60.minutes)
+    .build()
+
+suspend fun getCachedUptime(ign: String, link: Link?): BufferedImage?{
+    cache.get(ign)?.let {
+        logger.info { "Found cached uptime for $ign" }
+        return it
+    }
+    val uptime = getUptime(ign, link)?: return null
+    cache.put(ign, uptime)
+    return uptime
+}
+
 suspend fun getUptime(ign: String, link: Link?): BufferedImage? {
     logger.info { "Getting uptime for $ign" }
     val uuid = getMinecraftUUID(ign)
