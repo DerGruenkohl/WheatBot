@@ -15,6 +15,8 @@ kandy = "0.8.0"
 updater = "0.52.0"
 decoroutine = "2.4.8"
 cache = "0.14.0"
+scrimage = "4.3.0"
+skiko = "0.9.3"
 
 
 [libraries]
@@ -45,6 +47,7 @@ kandy-lets-plot = { group = "org.jetbrains.kotlinx", name = "kandy-lets-plot", v
 kandy-api = { group = "org.jetbrains.kotlinx", name = "kandy-api", version.ref = "kandy" }
 decoroutine = { group = "dev.reformator.stacktracedecoroutinator", name = "stacktrace-decoroutinator-jvm", version.ref = "decoroutine" }
 cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.ref = "cache" }
+scrimage = { group = "com.sksamuel.scrimage", name = "scrimage-core", version.ref = "scrimage" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -83,5 +86,6 @@ misc = [
     "decoroutine",
     "logback",
     "hypixel",
-    "cache"
+    "cache",
+    "scrimage"
 ]

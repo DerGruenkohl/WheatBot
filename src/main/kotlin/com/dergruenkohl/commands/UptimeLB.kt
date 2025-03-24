@@ -138,7 +138,7 @@ class UptimeLB(private val buttons: Buttons, private val modals: Modals): Applic
             ).await()
             msgHook.editMessage("Loaded").await()
         }catch (e: Exception){
-            logger.error{ e }
+            logger.error { e }
             msgHook.editMessage("Failed to find player").await()
             return
         }

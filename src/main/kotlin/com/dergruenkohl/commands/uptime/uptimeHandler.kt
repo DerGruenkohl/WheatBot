@@ -9,6 +9,7 @@ import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
 import com.dergruenkohl.hypixel.data.guild.Member
 import com.dergruenkohl.utils.database.Link
+import com.sksamuel.scrimage.ImmutableImage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
@@ -66,7 +67,6 @@ suspend fun getUptime(ign: String): Member? {
     val member = guild.members.find { it.uuid == uuid }?: return null
     return member
 }
-
 private class ImageGen(private val member: Member, private val ign: String, private val link: Link?){
     private val width = 530
     private val height = 450
