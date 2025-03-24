@@ -45,3 +45,4 @@ bin/
 /config.properties
 /src/main/kotlin/com/dergruenkohl/api/hypixelapi/KtorHypixelClient.kt
 /src/main/kotlin/com/dergruenkohl/utils/migrations/Migrator.kt
+/test-files/dev-config/config.json

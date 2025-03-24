@@ -1,0 +1,87 @@
+[versions]
+kotlin = "2.1.10"
+ktor = "3.1.1"
+jda = "5.3.0"
+jda-emojis = "3.0.0"
+logback = "1.5.18"
+exposed = "0.60.0"
+hypixel = "0.3.3"
+flyway = "11.4.1"
+hikari = "6.3.0"
+h2 = "2.3.232"
+mariadb = "3.5.2"
+botcommands = "3.0.0-beta.1"
+kandy = "0.8.0"
+updater = "0.52.0"
+decoroutine = "2.4.8"
+cache = "0.14.0"
+
+
+[libraries]
+jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+botcommands = {group = "io.github.freya022", name = "BotCommands", version.ref = "botcommands"}
+jda-emojis = { group = "dev.freya02", name = "jda-emojis", version.ref = "jda-emojis" }
+
+logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-json = { group = "org.jetbrains.exposed", name = "exposed-json", version.ref = "exposed" }
+mariadb = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb" }
+hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
+h2 = { group = "com.h2database", name = "h2", version.ref = "h2" }
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
+
+
+ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation-jvm", version.ref = "ktor" }
+
+hypixel = { group = "com.github.DerGruenkohl", name = "Hypixel-Kotlin", version.ref = "hypixel" }
+kandy-lets-plot = { group = "org.jetbrains.kotlinx", name = "kandy-lets-plot", version.ref = "kandy" }
+kandy-api = { group = "org.jetbrains.kotlinx", name = "kandy-api", version.ref = "kandy" }
+decoroutine = { group = "dev.reformator.stacktracedecoroutinator", name = "stacktrace-decoroutinator-jvm", version.ref = "decoroutine" }
+cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.ref = "cache" }
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-seriazliation = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+updater = { id = "com.github.ben-manes.versions", version.ref = "updater" }
+
+[bundles]
+jda = [
+    "jda-emojis",
+    "jda",
+    "botcommands"
+]
+ktor = [
+    "ktor-serialization",
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+]
+database = [
+    "exposed-core",
+    "exposed-dao",
+    "exposed-jdbc",
+    "exposed-json",
+    "mariadb",
+    "hikari",
+    "h2",
+    "flyway-core"
+]
+kandy = [
+    "kandy-lets-plot",
+    "kandy-api"
+]
+misc = [
+    "decoroutine",
+    "logback",
+    "hypixel",
+    "cache"
+]

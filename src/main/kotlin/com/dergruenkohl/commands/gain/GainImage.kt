@@ -110,7 +110,7 @@ class GainImage(private val gain: GraphPlayer, private val goal: Long) {
 
             g.drawImage(head1, image.width - head1.width -50, 65, null)
         } catch (e: IIOException) {
-            logger.info("Skin api died again}")
+            logger.info { "Skin api died again}" }
         }
 
         //Draw the text boxes
