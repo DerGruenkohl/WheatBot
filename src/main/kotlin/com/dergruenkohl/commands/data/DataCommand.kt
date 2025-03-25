@@ -109,13 +109,13 @@ object DataCommand : ApplicationCommand() {
             hook.setEphemeral(true).sendMessage("Getting data for ${user.name}").queue()
 
             val link =
-                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").queue()
+                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").setEmbeds().queue()
             var data = ProfileDataRepo.getWeightData(link.uuid)
             if (days > 0) {
                 data = data.filterKeys { it > LocalDate.now().toEpochDay() - days }
             }
             if (data.isEmpty()) {
-                return hook.editOriginal("${user.name} has no tracked data").queue()
+                return hook.editOriginal("${user.name} has no tracked data").setEmbeds().queue()
             }
 
             val ign = getMinecraftUsername(link.uuid)
@@ -149,7 +149,7 @@ object DataCommand : ApplicationCommand() {
             hook.setEphemeral(true).sendMessage("Getting data for ${user.name}").queue()
 
             val link =
-                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").queue()
+                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").setEmbeds().queue()
             var data = ProfileDataRepo.getFarmingCollectionsDataByKey(link.uuid, collection).mapValues {
                 it.value ?: 0
             }
@@ -157,7 +157,7 @@ object DataCommand : ApplicationCommand() {
                 data = data.filterKeys { it > LocalDate.now().toEpochDay() - days }
             }
             if (data.isEmpty()) {
-                return hook.editOriginal("${user.name} has no tracked data").queue()
+                return hook.editOriginal("${user.name} has no tracked data").setEmbeds().queue()
             }
             val ign = getMinecraftUsername(link.uuid)
             val plot = getCachedPlot(data, "$collection collection graph for $ign", collection).toPNG()
@@ -187,7 +187,7 @@ object DataCommand : ApplicationCommand() {
             hook.setEphemeral(true).sendMessage("Getting data for ${user.name}").queue()
 
             val link =
-                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").queue()
+                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").setEmbeds().queue()
             var data = ProfileDataRepo.getPestDropsDataByKey(link.uuid, collection).mapValues {
                 it.value ?: 0.0
             }
@@ -195,7 +195,7 @@ object DataCommand : ApplicationCommand() {
                 data = data.filterKeys { it > LocalDate.now().toEpochDay() - days }
             }
             if (data.isEmpty()) {
-                return hook.editOriginal("${user.name} has no tracked data").queue()
+                return hook.editOriginal("${user.name} has no tracked data").setEmbeds().queue()
             }
             val ign = getMinecraftUsername(link.uuid)
             val plot = getCachedPlot(data, "$collection pest collection graph for $ign", collection).toPNG()
@@ -224,7 +224,7 @@ object DataCommand : ApplicationCommand() {
             hook.setEphemeral(true).sendMessage("Getting data for ${user.name}").queue()
 
             val link =
-                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").queue()
+                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").setEmbeds().queue()
             var data = ProfileDataRepo.getSkillsDataByKey(link.uuid, collection).mapValues {
                 it.value ?: 0.0
             }
@@ -232,7 +232,7 @@ object DataCommand : ApplicationCommand() {
                 data = data.filterKeys { it > LocalDate.now().toEpochDay() - days }
             }
             if (data.isEmpty()) {
-                return hook.editOriginal("${user.name} has no tracked data").queue()
+                return hook.editOriginal("${user.name} has no tracked data").setEmbeds().queue()
             }
             val ign = getMinecraftUsername(link.uuid)
             val plot = getCachedPlot(data, "$collection xp graph for $ign", collection).toPNG()
@@ -264,7 +264,7 @@ object DataCommand : ApplicationCommand() {
             hook.setEphemeral(true).sendMessage("Getting data for ${user.name}").queue()
 
             val link =
-                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").queue()
+                LinkRepo.getLink(userId) ?: return hook.editOriginal("${user.name} isnt linked to the bot").setEmbeds().queue()
             var data = ProfileDataRepo.getMiningCollectionsDataByKey(link.uuid, collection).mapValues {
                 it.value ?: 0
             }
@@ -272,7 +272,7 @@ object DataCommand : ApplicationCommand() {
                 data = data.filterKeys { it > LocalDate.now().toEpochDay() - days }
             }
             if (data.isEmpty()) {
-                return hook.editOriginal("${user.name} has no tracked data").queue()
+                return hook.editOriginal("${user.name} has no tracked data").setEmbeds().queue()
             }
             val ign = getMinecraftUsername(link.uuid)
             val plot = getCachedPlot(data, "$collection collection graph for $ign", collection).toPNG()
