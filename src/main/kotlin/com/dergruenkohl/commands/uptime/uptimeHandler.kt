@@ -135,13 +135,16 @@ private class NewImageGen(
         75
     )
 
+
     private val canvas = if (link?.settings?.customImage == true) {
         try {
             ImmutableImage.loader().fromPath(Data.folder.resolve("images/${link.discordId}.png"))
         } catch (e: Exception) {
+            logger.warn(e) { "failed to load image" }
             baseImage
         }
     } else {
+        logger.info { "No custom image" }
         baseImage
     }
         .scaleTo(WIDTH, HEIGHT)
