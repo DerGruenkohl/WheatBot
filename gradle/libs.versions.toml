@@ -16,7 +16,6 @@ updater = "0.52.0"
 decoroutine = "2.4.8"
 cache = "0.14.0"
 scrimage = "4.3.0"
-skiko = "0.9.3"
 
 
 [libraries]

@@ -5,6 +5,7 @@ import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
+import com.sksamuel.scrimage.nio.PngWriter
 import dev.minn.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
@@ -34,6 +35,8 @@ import javax.imageio.ImageIO
 @Command
 object Uptime: ApplicationCommand() {
     private val logger = KotlinLogging.logger {}
+    private val writer = PngWriter()
+
     @JDASlashCommand(name = "uptime", description = "Get the uptime of a player")
     suspend fun onUptime(event: GlobalSlashEvent, @SlashOption("ign", "The Person you want to view the Uptime off") name: String?) {
         event.replyEmbeds(getLoading()).queue()
@@ -49,14 +52,10 @@ object Uptime: ApplicationCommand() {
                 title = "Error"
                 description = "Could not get uptime for $name"
             }).queue()
-
-            val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
-                ImageIO.write(uptime, "png", os)
-            }
+            val imgBytes = uptime.bytes(writer)
             event.hook.editOriginal("")
                 .setEmbeds()
-                .setFiles(FileUpload.fromData(os.toByteArray(), "uptime.png"))
+                .setFiles(FileUpload.fromData(imgBytes, "uptime.png"))
                 .queue()
         } catch (e: Exception) {
             logger.error { e }

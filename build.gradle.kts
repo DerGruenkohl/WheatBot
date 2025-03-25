@@ -7,29 +7,14 @@ plugins {
     alias(libs.plugins.kotlin.seriazliation)
 }
 
-group = "de.meow"
-version = "1.0-SNAPSHOT"
+group = "com.dergruenkohl"
+version = "1.0"
 
 repositories {
     mavenCentral()
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://jitpack.io")
 }
-val osName = System.getProperty("os.name")
-val targetOs = when {
-    osName == "Mac OS X" -> "macos"
-    osName.startsWith("Win") -> "windows"
-    osName.startsWith("Linux") -> "linux"
-    else -> error("Unsupported OS: $osName")
-}
-
-val osArch = System.getProperty("os.arch")
-val targetArch = when (osArch) {
-    "x86_64", "amd64" -> "x64"
-    "aarch64" -> "arm64"
-    else -> error("Unsupported arch: $osArch")
-}
-val target = "${targetOs}-${targetArch}"
 
 dependencies {
     testImplementation(kotlin("test"))
@@ -39,7 +24,6 @@ dependencies {
     implementation(libs.bundles.kandy)
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.misc)
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:0.9.3")
 }
 
 tasks.test {

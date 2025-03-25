@@ -40,7 +40,17 @@ fun Member.getAverageUptime(): Time {
     val hoursInt = floor(avghrs).toInt()
     val minutes = ((avghrs - hoursInt) * 60).toInt()
     return Time(hoursInt, minutes)
-
+}
+fun Member.getTotalUptime(): Time {
+    var totalhours = 0
+    var totalmins = 0
+    this.getFarmingUptime().forEach {
+        totalmins += it.value.mins
+        totalhours += it.value.hours
+    }
+    totalhours += floor(totalmins/60f).toInt()
+    val minutes = totalmins.mod(60)
+    return Time(totalhours, minutes)
 }
 
 @Serializable
