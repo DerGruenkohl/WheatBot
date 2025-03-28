@@ -78,7 +78,7 @@ class OvertakeImage(private val graph: OutgoingGraph) {
             """.trimIndent()
             image = "attachment://overtake.png"
             footer {
-                value = "Wheat! Powered by elitebot.dev"
+                this.name = "Wheat! Powered by elitebot.dev"
             }
         }
 
