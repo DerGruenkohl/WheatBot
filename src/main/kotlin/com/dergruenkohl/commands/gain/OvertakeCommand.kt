@@ -14,8 +14,6 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.TopLevelSlashCommandData
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.utils.FileUpload
 import java.io.ByteArrayOutputStream

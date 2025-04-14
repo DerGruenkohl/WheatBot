@@ -1,5 +1,6 @@
 package com.dergruenkohl.utils.database
 
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.api.hypixelClient
 import com.dergruenkohl.hypixel.client.getGuildById
 import com.dergruenkohl.hypixel.data.guild.Guild
@@ -13,8 +14,6 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
@@ -149,7 +148,7 @@ object GuildRepo {
         val saved = transaction {
             GuildEntity.find { GuildTable.guildId.eq(guildId) }.firstOrNull()
         }
-        CoroutineScope(Dispatchers.IO).launch {
+        WheatBot.IO.launch {
             logger.info { "Saving ${members.size} members" }
             members.forEach { it.save() }
         }

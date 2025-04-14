@@ -1,5 +1,6 @@
 package com.dergruenkohl.commands.gain
 
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
@@ -12,7 +13,6 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.TopLevelSlashCommandData
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.utils.FileUpload
@@ -93,7 +93,7 @@ object GainCommand: ApplicationCommand() {
             val overtake = GainImage(gainData, goal)
             val gen = overtake.generateGain()
             val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
+            withContext(WheatBot.IOContext) {
                 ImageIO.write(gen.second, "png", os)
             }
             hook.editOriginal("")
@@ -124,7 +124,7 @@ object GainCommand: ApplicationCommand() {
             val overtake = GainImage(gainData, goal)
             val gen = overtake.generateGain()
             val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
+            withContext(WheatBot.IOContext) {
                 ImageIO.write(gen.second, "png", os)
             }
             hook.editOriginal("")
@@ -155,7 +155,7 @@ object GainCommand: ApplicationCommand() {
             val overtake = GainImage(gainData, goal)
             val gen = overtake.generateGain()
             val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
+            withContext(WheatBot.IOContext) {
                 ImageIO.write(gen.second, "png", os)
             }
             hook.editOriginal("")
@@ -185,7 +185,7 @@ object GainCommand: ApplicationCommand() {
             val overtake = GainImage(gainData, goal)
             val gen = overtake.generateGain()
             val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
+            withContext(WheatBot.IOContext) {
                 ImageIO.write(gen.second, "png", os)
             }
             hook.editOriginal("")

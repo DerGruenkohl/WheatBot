@@ -11,7 +11,9 @@ import io.github.freya022.botcommands.api.commands.application.provider.GlobalAp
 import io.github.freya022.botcommands.api.components.Components.Companion.defaultPersistentTimeout
 import io.github.freya022.botcommands.api.core.BotCommands
 import io.github.freya022.botcommands.api.core.config.DevConfig
+import io.github.freya022.botcommands.api.core.utils.namedDefaultScope
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.interactions.IntegrationType
 import net.dv8tion.jda.api.interactions.InteractionContextType
@@ -21,11 +23,32 @@ import kotlin.io.path.absolutePathString
 import kotlin.system.exitProcess
 
 
-object WheatBot {
+object WheatBot: CoroutineScope {
     private val logger = KotlinLogging.logger {  }
     private const val mainPackageName = "com.dergruenkohl"
     const val botName = "CarryService"
     lateinit var jda: JDA
+
+    /**
+     * Default scope for the bot, used for all tasks that are not IO or auto
+     */
+    override val coroutineContext = namedDefaultScope(
+        name = "WheatBot",
+        corePoolSize = 8
+    ).coroutineContext
+    /**
+     * Scope for IO tasks, like database access and network requests
+     */
+    val IO = object : CoroutineScope {
+        override val coroutineContext = namedDefaultScope("WheatBot IO", 16).coroutineContext
+    }
+    /**
+     * Scope for auto tasks, like the ones that run every 5 minutes
+    */
+    val AUTO = object : CoroutineScope {
+        override val coroutineContext = namedDefaultScope("WheatBot AUTO", 4).coroutineContext
+    }
+    val IOContext = IO.coroutineContext
 
     @JvmStatic
     fun main(args: Array<out String>) {

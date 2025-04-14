@@ -1,5 +1,6 @@
 package com.dergruenkohl.commands.uptime
 
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.api.hypixelClient
 import com.dergruenkohl.config.Data
 import com.dergruenkohl.hypixel.client.getGuildByPlayer
@@ -16,20 +17,16 @@ import com.sksamuel.scrimage.canvas.drawables.FilledRect
 import com.sksamuel.scrimage.canvas.drawables.Text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.reactivecircus.cache4k.Cache
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.awt.Color
 import java.awt.Font
 import java.awt.font.TextAttribute
-import java.awt.image.BufferedImage
 import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.io.path.inputStream
 import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
-private val scope = CoroutineScope(Dispatchers.IO)
 private val cache = Cache.Builder<String, ImmutableImage>()
     .expireAfterWrite(60.minutes)
     .build()
@@ -48,7 +45,7 @@ suspend fun getUptime(ign: String, link: Link?): ImmutableImage? {
     logger.info { "Getting uptime for $ign" }
     val uuid = getMinecraftUUID(ign)
     val guild = hypixelClient.getGuildByPlayer(uuid).guild ?: return null
-    scope.launch {
+    WheatBot.launch {
         guild.save()
     }
     val member = guild.members.find { it.uuid == uuid } ?: return null
@@ -59,7 +56,7 @@ suspend fun getUptime(ign: String): Member? {
     logger.info { "Getting uptime for $ign" }
     val uuid = getMinecraftUUID(ign)
     val guild = hypixelClient.getGuildByPlayer(uuid).guild ?: return null
-    scope.launch {
+    WheatBot.launch {
         guild.save()
     }
     val member = guild.members.find { it.uuid == uuid } ?: return null

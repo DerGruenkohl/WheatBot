@@ -1,5 +1,6 @@
 package com.dergruenkohl.commands
 
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.config.Data
 import com.dergruenkohl.config.Environment
 import dev.minn.jda.ktx.messages.Embed
@@ -13,7 +14,6 @@ import io.github.freya022.botcommands.api.components.annotations.ComponentData
 import io.github.freya022.botcommands.api.components.annotations.JDAButtonListener
 import io.github.freya022.botcommands.api.components.builder.bindWith
 import io.github.freya022.botcommands.api.components.event.ButtonEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.dv8tion.jda.api.entities.Message.Attachment
 import net.dv8tion.jda.api.entities.User
@@ -41,7 +41,7 @@ class UploadCommand(private val buttons: Buttons): ApplicationCommand() {
         )
 
         val os = ByteArrayOutputStream()
-        withContext(Dispatchers.IO) {
+        withContext(WheatBot.IOContext) {
             ImageIO.write(ImageIO.read(URL(file.url)), "png", os)
         }
 
