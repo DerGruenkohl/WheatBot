@@ -4,6 +4,7 @@ import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.getMinecraftUsername
+import com.sksamuel.scrimage.nio.PngWriter
 import dev.minn.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.CommandPath
 import io.github.freya022.botcommands.api.commands.annotations.Command
@@ -75,6 +76,7 @@ object OvertakeCommand : ApplicationCommand() {
         return super.getOptionChoices(guild, commandPath, optionName)
     }
     private val logger = KotlinLogging.logger {  }
+    private val writer = PngWriter()
 
     @TopLevelSlashCommandData(description = "Calculate the overtake")
     @JDASlashCommand(name = "overtake", description = "Calculate the overtake", subcommand = "collection")
@@ -95,12 +97,8 @@ object OvertakeCommand : ApplicationCommand() {
 
             val overtake = Overtake(uuid1, uuid2, collection, days).getCollectionOvertake()?: return hook.editOriginal("Error calculating overtake").queue()
             val reply = OvertakeImage(overtake).generateOvertake()
-            val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
-                ImageIO.write(reply.second, "png", os)
-            }
             hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                .setFiles(FileUpload.fromData(reply.second.bytes(writer), "overtake.png"))
                 .setEmbeds(reply.first)
                 .queue()
 
@@ -128,12 +126,8 @@ object OvertakeCommand : ApplicationCommand() {
 
             val overtake = Overtake(uuid1, uuid2, collection, days).getPestOvertake()?: return hook.editOriginal("Error calculating overtake").queue()
             val reply = OvertakeImage(overtake).generateOvertake()
-            val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
-                ImageIO.write(reply.second, "png", os)
-            }
             hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                .setFiles(FileUpload.fromData(reply.second.bytes(writer), "overtake.png"))
                 .setEmbeds(reply.first)
                 .queue()
 
@@ -161,12 +155,8 @@ object OvertakeCommand : ApplicationCommand() {
 
             val overtake = Overtake(uuid1, uuid2, collection, days).getSkillOverTake()?: return hook.editOriginal("Error calculating overtake").queue()
             val reply = OvertakeImage(overtake).generateOvertake()
-            val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
-                ImageIO.write(reply.second, "png", os)
-            }
             hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                .setFiles(FileUpload.fromData(reply.second.bytes(writer), "overtake.png"))
                 .setEmbeds(reply.first)
                 .queue()
 
@@ -193,12 +183,8 @@ object OvertakeCommand : ApplicationCommand() {
 
             val overtake = Overtake(uuid1, uuid2, "", days).getWeightOvertake()?: return hook.editOriginal("Error calculating overtake").queue()
             val reply = OvertakeImage(overtake).generateOvertake()
-            val os = ByteArrayOutputStream()
-            withContext(Dispatchers.IO) {
-                ImageIO.write(reply.second, "png", os)
-            }
             hook.editOriginal("")
-                .setFiles(FileUpload.fromData(os.toByteArray(), "overtake.png"))
+                .setFiles(FileUpload.fromData(reply.second.bytes(writer), "overtake.png"))
                 .setEmbeds(reply.first)
                 .queue()
 

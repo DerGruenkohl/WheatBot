@@ -14,8 +14,7 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.TopLevelSlashCommandData
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.utils.FileUpload
 import org.jetbrains.kotlinx.kandy.dsl.plot
 
@@ -39,7 +38,7 @@ object Uptime: ApplicationCommand() {
 
     @JDASlashCommand(name = "uptime", description = "Get the uptime of a player")
     suspend fun onUptime(event: GlobalSlashEvent, @SlashOption("ign", "The Person you want to view the Uptime off") name: String?) {
-        event.replyEmbeds(getLoading()).queue()
+        val hook = event.replyEmbeds(getLoading()).submit()
         try {
             //Get the minecraft username, if not provided, get the linked account and retrieve the ign for that
             val link = LinkRepo.getLink(event.user.idLong)
@@ -53,6 +52,7 @@ object Uptime: ApplicationCommand() {
                 description = "Could not get uptime for $name"
             }).queue()
             val imgBytes = uptime.bytes(writer)
+            hook.await()
             event.hook.editOriginal("")
                 .setEmbeds()
                 .setFiles(FileUpload.fromData(imgBytes, "uptime.png"))

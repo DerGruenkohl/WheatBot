@@ -173,7 +173,7 @@ object GainCommand: ApplicationCommand() {
         event: GlobalSlashEvent,
         @SlashOption(name = "user") user: String,
         @SlashOption(name = "days") days: Int = 7,
-        @SlashOption(name = "goal") goal: Long = 1_000_000_000
+        @SlashOption(name = "goal") goal: Long = 10_000
     ) {
         try {
             if (days < 1) return event.reply("days must be greater than 0").setEphemeral(true).queue()

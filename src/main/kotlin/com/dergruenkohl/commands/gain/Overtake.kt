@@ -2,6 +2,7 @@ package com.dergruenkohl.commands.gain
 
 import kotlin.reflect.full.memberProperties
 
+
 class Overtake(private val uuid1:String, private val uuid2:String, private val searchString: String, private val days: Int) {
 
     suspend fun getPestOvertake(): OutgoingGraph? {

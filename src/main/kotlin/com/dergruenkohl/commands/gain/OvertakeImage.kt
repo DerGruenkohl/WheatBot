@@ -1,9 +1,14 @@
 package com.dergruenkohl.commands.gain
 
+import com.dergruenkohl.config.Data
 import com.dergruenkohl.utils.getMinecraftUsername
-import dev.minn.jda.ktx.interactions.components.TextInputDefaults.value
+import com.sksamuel.scrimage.ImmutableImage
+import com.sksamuel.scrimage.canvas.drawables.DrawableImage
+import com.sksamuel.scrimage.canvas.drawables.FilledRect
+import com.sksamuel.scrimage.canvas.drawables.Text
 import dev.minn.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.*
 import java.awt.font.TextAttribute
@@ -17,29 +22,57 @@ import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
 
-class OvertakeImage(private val graph: OutgoingGraph) {
-    private val logger = KotlinLogging.logger {  }
 
-    fun Double.round(decimals: Int): BigDecimal {
-        return BigDecimal(this).setScale(decimals, RoundingMode.HALF_EVEN)
-    }
-    fun BigDecimal.formatBigDecimal(): String {
-        return when {
-            this >= BigDecimal("1000000000") -> {
-                val billions = this.divide(BigDecimal("1000000000"))
-                String.format("%.2fB", billions)
-            }
-            this >= BigDecimal("1000000") -> {
-                val millions = this.divide(BigDecimal("1000000"))
-                String.format("%.2fM", millions)
-            }
-            this >= BigDecimal("1000") -> {
-                val thousands = this.divide(BigDecimal("1000"))
-                String.format("%.2fk", thousands)
-            }
-            else -> this.toPlainString()
+class OvertakeImage(private val graph: OutgoingGraph) {
+    companion object{
+        private val logger = KotlinLogging.logger {  }
+
+        private fun Double.round(decimals: Int): BigDecimal {
+            return BigDecimal(this).setScale(decimals, RoundingMode.HALF_EVEN)
         }
+        private fun BigDecimal.formatBigDecimal(): String {
+            return when {
+                this >= BigDecimal("1000000000") -> {
+                    val billions = this.divide(BigDecimal("1000000000"))
+                    String.format("%.2fB", billions)
+                }
+                this >= BigDecimal("1000000") -> {
+                    val millions = this.divide(BigDecimal("1000000"))
+                    String.format("%.2fM", millions)
+                }
+                this >= BigDecimal("1000") -> {
+                    val thousands = this.divide(BigDecimal("1000"))
+                    String.format("%.2fk", thousands)
+                }
+                else -> this.toPlainString()
+            }
+        }
+        private val baseImage = ImmutableImage.loader().fromPath(Data.folder.resolve("images/wheatField.jpg"))
+        private val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        private val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
+        private val WIDTH = baseImage.width
+        private val HEIGHT = baseImage.height
+        private val blackBox = FilledRect(
+            0, 0, WIDTH, HEIGHT
+        ) {
+            it.color = Color(0f, 0f, 0f, 0.2f)
+        }
+        private val steve1 = ImmutableImage.loader().fromPath(Data.folder.resolve("images/steve_face.png"))
+
+        private fun getSkin(uuid: String) =
+            try {
+                val img = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/face"))
+                ImmutableImage.wrapAwt(img)
+            } catch (e: Exception) {
+                steve1
+            }.scale(0.3)
+
+
     }
+    private val canvas = baseImage
+        .copy()
+        .toCanvas()
+
 
     val category = when(graph.p1.type){
         "" -> "weight"
@@ -84,6 +117,147 @@ class OvertakeImage(private val graph: OutgoingGraph) {
 
 
     }
+    private val type = graph.p1.type.ifEmpty { "weight" }
+    private val titleText = "Overtake for $type. Using Gain from the past ${graph.p1.days} days"
+    private val title = Text(
+        titleText,
+        getCenteredStringCoordinates(
+            titleText,
+            WIDTH/2,
+            30,
+            font.deriveFont(20f)
+        ).first,
+        30
+    ) {
+        it.font = font.deriveFont(20f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+    private val skin1 = DrawableImage(
+        getSkin(graph.p1.uuid).flipX(),
+        50,
+        80
+    ){
+        it.setAntiAlias(true)
+    }
+    private val skin2Image = getSkin(graph.p2.uuid)
+    private val skin2 = DrawableImage(
+        skin2Image,
+        WIDTH-50-skin2Image.width,
+        80
+    ){
+        it.setAntiAlias(true)
+    }
+
+    private val ign1 = runBlocking { getMinecraftUsername(graph.p1.uuid) }
+    private val ign2 = runBlocking { getMinecraftUsername(graph.p2.uuid) }
+
+    private val username1 = Text(
+        runBlocking {
+            getMinecraftUsername(graph.p1.uuid)
+        },
+        getCenteredStringCoordinates(
+            ign1,
+            50 + skin2Image.width/2,
+            75,
+            font.deriveFont(18f)
+        ).first,
+        75
+    ) {
+        it.font = font.deriveFont(18f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+
+    private val username2 = Text(
+        ign2,
+        getCenteredStringCoordinates(
+            ign2,
+            WIDTH - 50 - skin2Image.width/2,
+            75,
+            font.deriveFont(18f)
+        ).first,
+        75
+    ) {
+        it.font = font.deriveFont(18f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+    private val overtakeTextString = "Overtake in:"
+    private val overtakeText1 = Text(
+        overtakeTextString,
+        getCenteredStringCoordinates(
+            overtakeTextString,
+            WIDTH/2,
+            150,
+            font.deriveFont(18f)
+        ).first,
+        150,
+    ){
+        it.font = font.deriveFont(18f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+    private val data = generateOvertakeDuration()
+
+    private val overtakeTextString2 = data.first
+    private val overtakeText2 = Text(
+        overtakeTextString2,
+        getCenteredStringCoordinates(
+            overtakeTextString2,
+            WIDTH/2,
+            175,
+            font.deriveFont(18f)
+        ).first,
+        175
+    ){
+        it.font = font.deriveFont(18f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+    private val overtakeTextString3 = "Estimated total: ${data.second?:"You have to farm more :)"}"
+    private val overtakeText3 = Text(
+        overtakeTextString3,
+        getCenteredStringCoordinates(
+            overtakeTextString3,
+            WIDTH/2,
+            200,
+            font.deriveFont(18f)
+        ).first,
+        200
+    ){
+        it.font = font.deriveFont(18f)
+        it.color = Color.WHITE
+        it.setAntiAlias(true)
+    }
+
+    private fun drawNewOvertakeImage(): ImmutableImage{
+        canvas.drawInPlace(
+            blackBox,
+            title,
+            skin1,
+            skin2,
+            username1,
+            username2,
+            overtakeText1,
+            overtakeText2,
+            overtakeText3
+        )
+        return canvas.image
+    }
+    fun getCenteredStringCoordinates(text: String, centerX: Int, centerY: Int, font: Font): Pair<Int, Int> {
+        val g = baseImage.awt().graphics
+        // Get the FontMetrics
+        val metrics: FontMetrics = g.getFontMetrics(font)
+        // Determine the width and height of the text
+        val textWidth = metrics.stringWidth(text)
+        val textHeight = metrics.height
+        // Calculate the top-left corner coordinates
+        val x = centerX - textWidth / 2
+        val y = centerY - textHeight / 2 + metrics.ascent
+        return Pair(x, y)
+    }
+
     private fun drawCenteredString(g: Graphics, text: String, rect: Rectangle, font: Font) {
         // Get the FontMetrics
         val metrics = g.getFontMetrics(font)
@@ -98,10 +272,6 @@ class OvertakeImage(private val graph: OutgoingGraph) {
     }
 
     private suspend fun generateOvertakeImage(): BufferedImage {
-
-        val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
-        val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
-
         val baseImage = javaClass.getResourceAsStream("/wheatField.jpg")
         val image = ImageIO.read(baseImage)
 
@@ -188,9 +358,9 @@ class OvertakeImage(private val graph: OutgoingGraph) {
         return after
     }
 
-    suspend fun generateOvertake(): Pair<MessageEmbed, BufferedImage> {
+    suspend fun generateOvertake(): Pair<MessageEmbed, ImmutableImage> {
         val embed = generateOvertakeEmbed()
         val img = generateOvertakeImage()
-        return Pair(embed, img)
+        return Pair(embed, ImmutableImage.wrapAwt(img))
     }
 }

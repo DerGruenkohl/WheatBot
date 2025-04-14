@@ -44,5 +44,6 @@ kotlin{
 
 
 application {
-    mainClass.set("com.dergruenkohl.MainKt")
+    mainClass.set("com.dergruenkohl.WheatBot")
 }
+

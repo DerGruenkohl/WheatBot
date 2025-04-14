@@ -1,6 +1,6 @@
 package com.dergruenkohl.services
 
-import com.dergruenkohl.jda
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.utils.database.LinkEntity
 import com.dergruenkohl.utils.database.LinkTable
 import io.github.freya022.botcommands.api.core.annotations.BEventListener
@@ -20,34 +20,14 @@ class ReadyListener {
     @BEventListener(priority = 1)
     fun onReadyFirst(event: ReadyEvent) {
         logger.info { "First handling of ReadyEvent" }
-        jda = event.jda
+        WheatBot.jda = event.jda
 
         //Print some information about the bot
-        logger.info { "Bot connected as ${jda.selfUser.name}" }
+        logger.info { "Bot connected as ${WheatBot.jda.selfUser.name}" }
         logger.info { "The bot is present on these guilds :" }
-        for (guild in jda.guildCache) {
+        for (guild in WheatBot.jda.guildCache) {
             logger.info { "\t- ${guild.name} (${guild.id})" }
         }
-    }
-
-    // Executes after the above listener, but doesn't prevent the listener below from running
-    @BEventListener(priority = 0, mode = BEventListener.RunMode.ASYNC)
-    suspend fun onReadyAsync(event: ReadyEvent) {
-        logger.info { "(Before) Async handling of ReadyEvent" }
-        delay(10.seconds)
-        transaction {
-            runBlocking {
-                LinkEntity.find { LinkTable.discordName.isNull() }.forEach {
-                    logger.info { "No user found for ${it.discordId}" }
-                    val user = jda.retrieveUserByIdOrNull(it.discordId, false)?: return@forEach logger.warn { "User not found" }
-                    logger.info { "Found user ${user.name}" }
-                    it.discordName = user.name
-                }
-            }
-
-        }
-
-        logger.info { "(After) Async handling of ReadyEvent" }
     }
 
     // Executes after the above listener

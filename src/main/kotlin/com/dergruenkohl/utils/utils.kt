@@ -2,6 +2,7 @@ package com.dergruenkohl.utils
 
 import com.dergruenkohl.api.client
 import dev.minn.jda.ktx.messages.Embed
+import io.github.freya022.botcommands.api.core.objectLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -60,28 +61,36 @@ fun <K, V> getPairsInRange(map: Map<K, V>, startIndex: Int, range: Int = 10): Li
         emptyList()
     }
 }
-fun getLoading(): MessageEmbed = Embed {
+suspend fun getLoading(): MessageEmbed = Embed {
     title = "Loading..."
     description = "Please wait a bit"
-    image = getMeow()
+    image = getCat()
+}
+
+@Serializable
+data class CatResponse(
+    val id: String,
+    val url: String,
+    val width: Int,
+    val height: Int
+)
+
+suspend fun getCat(): String{
+    try {
+        val url = client.get("https://api.thecatapi.com/v1/images/search").body<List<CatResponse>>()[0].url
+        return url
+    } catch (e: Exception) {
+        logger.warn { e }
+        return "https://cdn2.thecatapi.com/images/QUdOiX2hP.jpg"
+    }
 }
 
 fun getMeow() : String{
-    // The Cat API endpoint for random cat images
     val apiUrl = "https://api.thecatapi.com/v1/images/search"
-
-    // Create a URL object with the API endpoint
     val url = URL(apiUrl)
-
-    // Open a connection to the URL
     val connection = url.openConnection() as HttpURLConnection
-    connection.addRequestProperty("x-api-key", "live_ZooEr4cnhvcy325C4QwSyRA9lhxJAQq5FBztGXN06VeH1UqITCSHFJSZTVqQtS0j")
     connection.requestMethod = "GET"
-
-    // Get the response code
     val responseCode = connection.responseCode
-
-    // Check if the request was successful (status code 200)
     if (responseCode == HttpURLConnection.HTTP_OK) {
         // Read the response
         val reader = BufferedReader(InputStreamReader(connection.inputStream))
@@ -93,8 +102,13 @@ fun getMeow() : String{
         reader.close()
 
         // Parse the JSON response to extract the image URL
-        val imageUrl = response.toString().split("\"url\":\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1].split("\",\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        // Print the image URL
+        val imageUrl = response.toString()
+            .split("\"url\":\"".toRegex())
+            .dropLastWhile { it.isEmpty() }
+            .toTypedArray()[1]
+                .split("\",\"".toRegex())
+                .dropLastWhile { it.isEmpty() }
+                .toTypedArray()[0]
         println("Random Cat Image URL: $imageUrl")
         return imageUrl
     } else {
