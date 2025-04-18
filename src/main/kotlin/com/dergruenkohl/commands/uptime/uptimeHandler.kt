@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
 private val cache = Cache.Builder<String, ImmutableImage>()
-    .expireAfterWrite(60.minutes)
+    .expireAfterWrite(5.minutes)
     .build()
 
 suspend fun getCachedUptime(ign: String, link: Link?): ImmutableImage? {
