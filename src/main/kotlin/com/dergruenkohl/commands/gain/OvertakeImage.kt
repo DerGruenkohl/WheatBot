@@ -48,7 +48,7 @@ class OvertakeImage(private val graph: OutgoingGraph) {
             }
         }
         private val baseImage = ImmutableImage.loader().fromPath(Data.folder.resolve("images/wheatField.jpg"))
-        private val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        private val boldFont = this::class.java.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
         private val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
         private val WIDTH = baseImage.width
         private val HEIGHT = baseImage.height
