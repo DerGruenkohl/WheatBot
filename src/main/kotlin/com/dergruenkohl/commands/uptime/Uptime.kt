@@ -37,7 +37,7 @@ object Uptime: ApplicationCommand() {
     private val writer = PngWriter()
 
     @JDASlashCommand(name = "uptime", description = "Get the uptime of a player")
-    suspend fun onUptime(event: GlobalSlashEvent, @SlashOption("ign", "The Person you want to view the Uptime off") name: String?) {
+    suspend fun onUptime(event: GlobalSlashEvent, @SlashOption("ign", "The Person you want to view the Uptime of") name: String?) {
         val hook = event.replyEmbeds(getLoading()).submit()
         try {
             //Get the minecraft username, if not provided, get the linked account and retrieve the ign for that
