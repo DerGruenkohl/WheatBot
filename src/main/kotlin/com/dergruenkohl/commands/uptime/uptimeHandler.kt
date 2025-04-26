@@ -111,6 +111,7 @@ private class NewImageGen(
                 val img = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/full"))
                 ImmutableImage.wrapAwt(img)
             } catch (e: Exception) {
+                logger.error(e){ "Failed to load skin for $uuid, using default"}
                 baseSkin
             }.scale(0.4)
     }
