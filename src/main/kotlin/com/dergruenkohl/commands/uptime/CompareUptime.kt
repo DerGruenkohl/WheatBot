@@ -76,7 +76,6 @@ object CompareUptime: ApplicationCommand() {
         val xAxis = mutableListOf<String>()
         val yAxis = mutableListOf<Int>()
         val categories = mutableListOf<String>()
-
         for (member in members) {
             for ((timestamp, timeEntry) in member.getFarmingUptime()) {
                 xAxis.add(timestamp)

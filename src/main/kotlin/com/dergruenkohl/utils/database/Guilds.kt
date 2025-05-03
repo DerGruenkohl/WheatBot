@@ -150,7 +150,9 @@ object GuildRepo {
         }
         WheatBot.IO.launch {
             logger.info { "Saving ${members.size} members" }
-            members.forEach { it.save() }
+            members.forEach {
+                it.save()
+            }
         }
         if (saved == null) {
             transaction {

@@ -91,7 +91,7 @@ class GainImage(private val gain: GraphPlayer, private val goal: Long) {
 
     private suspend fun generateOvertakeImage(): BufferedImage {
 
-        val boldFont = javaClass.getResourceAsStream("/JetBrainsMono-ExtraBold.ttf")
+        val boldFont = javaClass.getResourceAsStream("/test-files/dev-data/fonts/JetBrainsMono-ExtraBold.ttf")
         val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
 
         val baseImage = javaClass.getResourceAsStream("/wheatField.jpg")

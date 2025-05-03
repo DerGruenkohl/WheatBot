@@ -13,6 +13,7 @@ import io.github.freya022.botcommands.api.commands.application.ApplicationComman
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.dv8tion.jda.api.utils.FileUpload
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.letsplot.export.toPNG
@@ -25,9 +26,11 @@ import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
 import java.time.LocalDate
+import kotlin.time.measureTime
 
 @Command
 object UptimeHistory: ApplicationCommand() {
+    private val logger = KotlinLogging.logger {  }
     @JDASlashCommand(name = "uptimehistory", description = "Get the uptime history of a player")
     suspend fun onUptimeHistory(
         event: GlobalSlashEvent,
@@ -42,8 +45,11 @@ object UptimeHistory: ApplicationCommand() {
                 description = "You need to provide a minecraft name or link your account"
             }).queue())
             val uuid = getMinecraftUUID(ign)
-
-            val data = UptimeRepo.getUptimeEntries(uuid)
+            var data: Map<Int, Time>
+            val dur = measureTime {
+                data = UptimeRepo.getUptimeEntries(uuid)
+            }
+            logger.info { "Fetched data in $dur" }
             val filteredData = if(days > 0) {
                 data.filter { it.key > LocalDate.now().toEpochDay() - days }
             }else {
