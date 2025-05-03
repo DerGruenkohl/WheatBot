@@ -6,6 +6,7 @@ import com.dergruenkohl.utils.database.LbHistoryEntity
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.getMinecraftUsername
+import com.dergruenkohl.utils.getUsernames
 import dev.freya02.jda.emojis.unicode.Emojis
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.row
@@ -79,13 +80,17 @@ class UptimeLB(private val buttons: Buttons, private val modals: Modals): Applic
         }
     }
     private suspend fun getLb(page: Int) = Embed {
-        val lb = GuildRepo.getTopMembersByFarmingUptime(page)
-            .mapIndexed { index, pair ->
-                val ign = getMinecraftUsername(pair.first)
-                val uptime = pair.second
-                val rank = (page - 1) * 10 + index + 1
-                "**$rank.** `$ign` - $uptime"
-            }
+        val members = GuildRepo.getTopMembersByFarmingUptime(page)
+        val uuids = members.map { it.first }
+        val usernames = getUsernames(uuids)
+
+        val lb = members.mapIndexed { index, pair ->
+            val uptime = pair.second
+            val rank = (page - 1) * 10 + index + 1
+            val ign = usernames[index]
+            "**$rank.** `$ign` - $uptime"
+        }
+
         title = "Uptime Leaderboard"
         description = lb.joinToString("\n")
         footer {

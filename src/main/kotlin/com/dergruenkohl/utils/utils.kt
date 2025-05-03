@@ -1,11 +1,14 @@
 package com.dergruenkohl.utils
 
+import com.dergruenkohl.WheatBot
 import com.dergruenkohl.api.client
 import dev.minn.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.core.objectLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.Clock
 
 import kotlinx.serialization.Serializable
@@ -48,6 +51,22 @@ private suspend fun getMojangResponse(identifier: String): MojangResponse {
 suspend fun getMinecraftUsername(uuid: String): String = getMojangResponse(uuid).name
 
 suspend fun getMinecraftUUID(name: String): String = getMojangResponse(name).id
+
+fun getUsernameAsync(uuid: String) = WheatBot.IO.async { getMinecraftUsername(uuid) }
+fun getUUIDAsync(name: String) = WheatBot.IO.async { getMinecraftUUID(name) }
+
+suspend fun getUsernames(uuids: List<String>): List<String> {
+    logger.info { "Getting usernames for UUIDs: $uuids" }
+    return uuids.map { uuid ->
+        getUsernameAsync(uuid)
+    }.awaitAll()
+}
+suspend fun getUUIDs(names: List<String>): List<String> {
+    logger.info { "Getting UUIDs for names: $names" }
+    return names.map { name ->
+        getUUIDAsync(name)
+    }.awaitAll()
+}
 
 fun <K, V> getPairsInRange(map: Map<K, V>, startIndex: Int, range: Int = 10): List<Pair<K, V>> {
     // Convert map entries to a list
