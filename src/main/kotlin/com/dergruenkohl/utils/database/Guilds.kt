@@ -18,15 +18,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.json.json
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
+import org.jetbrains.exposed.v1.dao.LongEntity
+import org.jetbrains.exposed.v1.dao.LongEntityClass
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.json.json
 
 class GuildEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<GuildEntity>(GuildTable)
@@ -50,11 +48,11 @@ class LbHistoryEntity(id: EntityID<Long>) : LongEntity(id) {
 object GuildTable : LongIdTable() {
     val guildId = text("guildId").uniqueIndex()
     val lastUpdated = long("lastUpdated")
-    val members: Column<String> = text("members")
+    val members = text("members")
 }
 
 object LbHistoryTable : LongIdTable("lb_history") {
-    val timestamp: Column<Long> = long("timestamp")
+    val timestamp = long("timestamp")
     val time = json("time", Json, Time.serializer())
 }
 

@@ -2,14 +2,12 @@ package com.dergruenkohl.utils
 
 import com.dergruenkohl.WheatBot
 import com.dergruenkohl.api.client
-import dev.minn.jda.ktx.messages.Embed
-import io.github.freya022.botcommands.api.core.objectLogger
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.datetime.Clock
 
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.MessageEmbed

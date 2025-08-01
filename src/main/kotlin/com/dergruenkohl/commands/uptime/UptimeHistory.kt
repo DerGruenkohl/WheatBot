@@ -7,7 +7,7 @@ import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.hypixelutils.Time
-import dev.minn.jda.ktx.messages.Embed
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent

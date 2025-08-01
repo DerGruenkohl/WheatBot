@@ -1,26 +1,28 @@
 [versions]
-kotlin = "2.2.0-Beta1"
-ktor = "3.1.2"
-jda = "5.3.2"
+kotlin = "2.2.20-Beta2"
+ktor = "3.2.3"
+jda = "6.0.0-rc.2"
 jda-emojis = "3.0.0"
 logback = "1.5.18"
-exposed = "0.61.0"
+exposed = "1.0.0-beta-5"
 hypixel = "0.3.3"
-flyway = "11.6.0"
-hikari = "6.3.0"
+flyway = "11.10.5"
+hikari = "7.0.0"
 h2 = "2.3.232"
-mariadb = "3.5.3"
-botcommands = "437be62c11"
-kandy = "0.8.0"
+mariadb = "3.5.4"
+botcommands = "feature~components-v2-SNAPSHOT"
+kandy = "0.8.1-local-1-dev-64"
 updater = "0.52.0"
-decoroutine = "2.4.8"
+decoroutine = "2.5.5"
 cache = "0.14.0"
-scrimage = "4.3.1"
+scrimage = "4.3.3"
+kotlinlogging = "7.0.10"
 
 
 [libraries]
 jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
-botcommands = {group = "io.github.freya022", name = "BotCommands", version.ref = "botcommands"}
+botcommands = {group = "com.github.freya022", name = "BotCommands", version.ref = "botcommands"}
+# com.github.freya022:BotCommands:8758b34af1
 jda-emojis = { group = "dev.freya02", name = "jda-emojis", version.ref = "jda-emojis" }
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
@@ -47,6 +49,7 @@ kandy-api = { group = "org.jetbrains.kotlinx", name = "kandy-api", version.ref =
 decoroutine = { group = "dev.reformator.stacktracedecoroutinator", name = "stacktrace-decoroutinator-jvm", version.ref = "decoroutine" }
 cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.ref = "cache" }
 scrimage = { group = "com.sksamuel.scrimage", name = "scrimage-core", version.ref = "scrimage" }
+kotlinlogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinlogging" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -86,5 +89,6 @@ misc = [
     "logback",
     "hypixel",
     "cache",
-    "scrimage"
+    "scrimage",
+    "kotlinlogging"
 ]

@@ -5,8 +5,7 @@ import com.dergruenkohl.utils.database.LinkRepo
 import com.dergruenkohl.utils.database.ProfileDataRepo
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUsername
-import dev.minn.jda.ktx.coroutines.await
-import dev.minn.jda.ktx.messages.Embed
+import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.CommandPath
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand

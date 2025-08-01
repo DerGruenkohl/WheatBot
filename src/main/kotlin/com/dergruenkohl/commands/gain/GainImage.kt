@@ -1,5 +1,6 @@
 package com.dergruenkohl.commands.gain
 
+import com.dergruenkohl.config.Data
 import com.dergruenkohl.utils.getMinecraftUsername
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.dv8tion.jda.api.EmbedBuilder
@@ -91,7 +92,7 @@ class GainImage(private val gain: GraphPlayer, private val goal: Long) {
 
     private suspend fun generateOvertakeImage(): BufferedImage {
 
-        val boldFont = javaClass.getResourceAsStream("/test-files/dev-data/fonts/JetBrainsMono-ExtraBold.ttf")
+        val boldFont = Data.folder.resolve("fonts/JetBrainsMono-ExtraBold.ttf").toFile()
         val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
 
         val baseImage = javaClass.getResourceAsStream("/wheatField.jpg")

@@ -31,7 +31,7 @@ object CompareUptime: ApplicationCommand() {
     @JDASlashCommand(name = "compare_uptime", description = "Compare the uptime of multiple players")
     suspend fun onCompareUptime(
         event: GlobalSlashEvent,
-        @SlashOption("ign", "The People you want to compare the Uptime of") @VarArgs(value = 5,) names: List<String>
+        @SlashOption("ign", "The People you want to compare the Uptime of") @VarArgs(value = 5, 1) names: List<String>
     ) {
         try {
             event.reply("getting uptime for ${names.joinToString(", ")}").queue()

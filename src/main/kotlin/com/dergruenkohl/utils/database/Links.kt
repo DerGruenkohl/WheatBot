@@ -1,24 +1,20 @@
 package com.dergruenkohl.utils.database
 
-import com.dergruenkohl.api.hypixelClient
-import com.dergruenkohl.hypixel.client.getSelectedProfileID
+
 import com.dergruenkohl.utils.getMinecraftUsername
-import dev.minn.jda.ktx.messages.Embed
-import kotlinx.coroutines.runBlocking
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.MessageEmbed
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.castTo
-import org.jetbrains.exposed.sql.json.JsonColumnType
-import org.jetbrains.exposed.sql.json.json
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
+import org.jetbrains.exposed.v1.dao.LongEntity
+import org.jetbrains.exposed.v1.dao.LongEntityClass
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.json.json
+
 
 private val json = Json {
     encodeDefaults = true
@@ -73,8 +69,8 @@ class LinkEntity(id: EntityID<Long>) : LongEntity(id) {
 
 
 object LinkTable : LongIdTable("links") {
-    val discordId: Column<Long> = long("discord_id").uniqueIndex()
-    val uuid: Column<String> = varchar("uuid", 36)
+    val discordId = long("discord_id").uniqueIndex()
+    val uuid = varchar("uuid", 36)
     val discordName: Column<String?> = varchar("discord_name", 255).nullable()
     val setting = json("settings", json, Settings.serializer())
 }

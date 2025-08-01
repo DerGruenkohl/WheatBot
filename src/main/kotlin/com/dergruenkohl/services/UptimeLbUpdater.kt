@@ -8,7 +8,7 @@ import com.dergruenkohl.utils.scheduleRepeating
 import io.github.freya022.botcommands.api.core.service.annotations.BService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlin.math.floor

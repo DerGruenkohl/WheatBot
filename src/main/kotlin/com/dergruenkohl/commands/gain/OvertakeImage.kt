@@ -6,7 +6,7 @@ import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.canvas.drawables.DrawableImage
 import com.sksamuel.scrimage.canvas.drawables.FilledRect
 import com.sksamuel.scrimage.canvas.drawables.Text
-import dev.minn.jda.ktx.messages.Embed
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -48,7 +48,9 @@ class OvertakeImage(private val graph: OutgoingGraph) {
             }
         }
         private val baseImage = ImmutableImage.loader().fromPath(Data.folder.resolve("images/wheatField.jpg"))
-        private val boldFont = this::class.java.getResourceAsStream("/test-files/dev-data/fonts/JetBrainsMono-ExtraBold.ttf")
+        private val boldFont = Data.folder.resolve("fonts/JetBrainsMono-ExtraBold.ttf").toFile().apply {
+            logger.info { "File: ${this.name}, size: ${this.totalSpace}" }
+        }
         private val font = Font.createFont(Font.TRUETYPE_FONT, boldFont)
         private val WIDTH = baseImage.width
         private val HEIGHT = baseImage.height

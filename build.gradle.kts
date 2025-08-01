@@ -36,7 +36,7 @@ tasks.withType<ShadowJar> {
 }
 
 kotlin{
-    jvmToolchain(17)
+    jvmToolchain(21)
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-receivers")
     }

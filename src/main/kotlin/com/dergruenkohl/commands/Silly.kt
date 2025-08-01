@@ -1,7 +1,7 @@
 package com.dergruenkohl.commands
 
 import com.dergruenkohl.utils.getMeow
-import dev.minn.jda.ktx.messages.Embed
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent

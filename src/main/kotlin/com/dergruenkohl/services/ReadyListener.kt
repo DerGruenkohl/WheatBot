@@ -9,8 +9,6 @@ import io.github.freya022.botcommands.api.core.utils.retrieveUserByIdOrNull
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.events.session.ReadyEvent
-import org.jetbrains.exposed.sql.transactions.transaction
-import kotlin.time.Duration.Companion.seconds
 
 // You can optionally have a name to differentiate between multiple instance of your services
 @BService(name = "ReadyListner")

@@ -3,7 +3,8 @@ package com.dergruenkohl.commands
 import com.dergruenkohl.WheatBot
 import com.dergruenkohl.config.Data
 import com.dergruenkohl.config.Environment
-import dev.minn.jda.ktx.messages.Embed
+import dev.freya02.botcommands.jda.ktx.components.row
+import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
@@ -23,12 +24,19 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 @Command
-class UploadCommand(private val buttons: Buttons): ApplicationCommand() {
+class UploadCommand(private val buttons: Buttons) : ApplicationCommand() {
     @JDASlashCommand(name = "upload")
-    suspend fun onUpload(event: GlobalSlashEvent, @SlashOption("file", "The file you want to upload") file: Attachment) {
+    suspend fun onUpload(
+        event: GlobalSlashEvent,
+        @SlashOption("file", "The file you want to upload") file: Attachment
+    ) {
         event.reply("Uploading").setEphemeral(true).queue()
-        val channel = if(Environment.isDev){event.channel} else {event.jda.getTextChannelById(1252738320107180215)!!}
-        if(!file.isImage) {
+        val channel = if (Environment.isDev) {
+            event.channel
+        } else {
+            event.jda.getTextChannelById(1252738320107180215)!!
+        }
+        if (!file.isImage) {
             event.hook.editOriginal("File is not supported").queue()
             return
         }
@@ -46,25 +54,28 @@ class UploadCommand(private val buttons: Buttons): ApplicationCommand() {
         }
 
         channel.sendMessage(event.user.id)
-            .addActionRow(
+            .setComponents(
+                row(
                 buttons.success("approve").persistent {
                     bindWith(::handle, true, event.user)
                 },
                 buttons.danger("deny").persistent {
                     bindWith(::handle, false, event.user)
                 }
-            )
+
+            ))
             .addFiles(FileUpload.fromData(os.toByteArray(), "${file.fileName}.png"))
             .queue()
     }
+
     @JDAButtonListener
-    suspend fun handle(event: ButtonEvent, @ComponentData approved: Boolean, @ComponentData user: User){
+    suspend fun handle(event: ButtonEvent, @ComponentData approved: Boolean, @ComponentData user: User) {
         val file = event.message.attachments[0]
-        if(approved){
+        if (approved) {
             event.reply("Approved").queue()
 
             val folder = Data.folder.resolve("images").toFile()
-            if(!folder.exists()){
+            if (!folder.exists()) {
                 folder.mkdirs()
             }
             val img = folder.resolve("${user.id}.${file.fileExtension}")

@@ -3,8 +3,8 @@ package com.dergruenkohl.commands.links
 import com.dergruenkohl.utils.database.LinkRepo
 import com.dergruenkohl.utils.database.Settings
 import com.dergruenkohl.utils.ErrorHandler
-import dev.minn.jda.ktx.coroutines.await
-import dev.minn.jda.ktx.interactions.components.row
+import dev.freya02.botcommands.jda.ktx.components.row
+import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
@@ -22,7 +22,7 @@ import io.github.freya022.botcommands.api.modals.annotations.ModalInput
 import io.github.freya022.botcommands.api.modals.create
 import io.github.freya022.botcommands.api.modals.shortTextInput
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.components.actionrow.ActionRow
 
 @Command
 class SettingManagement(private val buttons: Buttons, private val modals: Modals): ApplicationCommand() {
