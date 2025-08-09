@@ -4,7 +4,7 @@ import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.StreamingGifWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
-import dev.freya02.botcommands.jda.ktx.components.MediaGallery
+import java.nio.file.Files
 import dev.freya02.botcommands.jda.ktx.components.MediaGalleryItem
 import dev.freya02.botcommands.jda.ktx.components.TextDisplay
 import io.github.freya022.botcommands.api.commands.annotations.Command
@@ -23,9 +23,8 @@ import java.io.OutputStream
 import java.net.URL
 import java.time.Duration
 import javax.imageio.ImageIO
-import kotlin.div
-import kotlin.text.toInt
-import kotlin.time.Duration.Companion.seconds
+import javax.imageio.ImageWriteParam
+
 
 @Command
 class GifCommand: ApplicationCommand() {
@@ -82,62 +81,95 @@ class GifCommand: ApplicationCommand() {
             }
             event.hook.editOriginal("").setComponents(container).useComponentsV2().queue()
         } catch (e: Exception) {
-            logger.error { e }
+            logger.error(e) { "Error while converting" }
             event.hook.editOriginal("An error occurred while converting").queue()
         }
     }
 
     fun convertVideo(attachment: Message.Attachment, stream: OutputStream, progressCallback: (Int) -> Unit = {}) {
-        val grabber = FFmpegFrameGrabber(URL(attachment.url))
-        val converter = Java2DFrameConverter()
+        val tempDir = Files.createTempDirectory("gif_conversion")
+        val inputFile = tempDir.resolve("input")
+        val outputFile = tempDir.resolve("output.gif")
 
         try {
-            grabber.start()
-            val frameRate = grabber.frameRate
-            val videoDuration = grabber.lengthInTime / 1_000_000.0
-            val targetFps = 15.0
-
-            val totalFramesToExtract = (videoDuration * targetFps).toInt()
-            val frameSkip = (frameRate / targetFps).toInt().coerceAtLeast(1)
-            val frameDelayMs = (1000.0 / targetFps).toLong()
-
-            val writer = StreamingGifWriter(Duration.ofMillis(frameDelayMs), true, false)
-            val gif = writer.prepareStream(stream, java.awt.image.BufferedImage.TYPE_INT_RGB)
-
-            var frameNumber = 0
-            var extractedFrames = 0
-            var frame = grabber.grabFrame()
-            var lastProgress = -1
-
-            while (frame != null && extractedFrames < totalFramesToExtract) {
-                if (frameNumber % frameSkip == 0 && frame.image != null) {
-                    val bufferedImage = converter.convert(frame)
-                    val immutableImage = ImmutableImage.fromAwt(bufferedImage)
-                        .scaleToWidth(320)
-
-                    gif.writeFrame(immutableImage)
-                    extractedFrames++
-
-                    // Update progress every 5%
-                    val progress = (extractedFrames * 100) / totalFramesToExtract
-                    if (progress != lastProgress && progress % 5 == 0) {
-                        progressCallback(progress)
-                        lastProgress = progress
-                    }
-                }
-                frame = grabber.grabFrame()
-                frameNumber++
+            // Download input file
+            URL(attachment.url).openStream().use { input ->
+                Files.copy(input, inputFile)
             }
 
-            gif.close()
+            // Build FFmpeg command with high-quality settings
+            val command = listOf(
+                "ffmpeg", "-y", "-i", inputFile.toString(),
+                "-vf", "fps=25,scale=-1:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle",
+                "-loop", "0",
+                outputFile.toString()
+            )
+
+            val process = ProcessBuilder(command)
+                .redirectErrorStream(true)
+                .start()
+
+            // Monitor progress by reading FFmpeg output
+            process.inputStream.bufferedReader().use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    line?.let {
+                        // Parse FFmpeg progress output if needed
+                        if (it.contains("time=")) {
+                            // Extract progress and call progressCallback
+                        }
+                    }
+                }
+            }
+
+            val exitCode = process.waitFor()
+            if (exitCode == 0) {
+                Files.copy(outputFile, stream)
+            } else {
+                throw RuntimeException("FFmpeg conversion failed with exit code: $exitCode")
+            }
 
         } finally {
-            grabber.stop()
-            grabber.release()
+            // Cleanup temp files
+            Files.deleteIfExists(inputFile)
+            Files.deleteIfExists(outputFile)
+            Files.deleteIfExists(tempDir)
         }
     }
+
     fun convertImage(attachment: Message.Attachment, stream: OutputStream) {
-        val image = ImageIO.read(URL(attachment.url))
-        ImageIO.write(image, "gif", stream)
+        val tempDir = Files.createTempDirectory("gif_conversion")
+        val inputFile = tempDir.resolve("input")
+        val outputFile = tempDir.resolve("output.gif")
+
+        try {
+            // Download input file
+            URL(attachment.url).openStream().use { input ->
+                Files.copy(input, inputFile)
+            }
+
+            // Build FFmpeg command for single image
+            val command = listOf(
+                "ffmpeg", "-y", "-i", inputFile.toString(),
+                "-vf", "scale=-1:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:stats_mode=single[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3",
+                "-t", "1",
+                outputFile.toString()
+            )
+
+            val process = ProcessBuilder(command).start()
+            val exitCode = process.waitFor()
+
+            if (exitCode == 0) {
+                Files.copy(outputFile, stream)
+            } else {
+                throw RuntimeException("FFmpeg conversion failed with exit code: $exitCode")
+            }
+
+        } finally {
+            // Cleanup temp files
+            Files.deleteIfExists(inputFile)
+            Files.deleteIfExists(outputFile)
+            Files.deleteIfExists(tempDir)
+        }
     }
 }
