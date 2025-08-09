@@ -85,6 +85,14 @@ object GuildRepo {
                     .toList()
         }
     }
+    fun getLbSize(): Int {
+        return transaction {
+            GuildEntity.all()
+                    .flatMap { it.members }
+                    .sortedByDescending { it.expHistory.values.sum() }
+                    .count()
+        }
+    }
 
     fun getPageForMember(memberUuid: String): Int {
         val pageSize = 10

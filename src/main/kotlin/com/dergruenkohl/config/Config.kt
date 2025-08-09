@@ -29,11 +29,14 @@ data class Config(
     val token: String,
     val botId: Long,
     val ownerIds: List<Long>,
+    val serverPort: Int,
     val testGuildIds: List<Long>,
     val databaseConfig: DatabaseConfig,
     val mainDatabase: DatabaseConfig,
     val hypixelAPI: String,
     val kohlAPI: String,
+    val encrypingHostPassword: String = "WheatBot",
+    val encryptingHostUserKey: String
 ) {
     // Wiki configs
     @get:JvmName("areTagsEnabled")

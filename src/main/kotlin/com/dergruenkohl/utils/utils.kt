@@ -2,17 +2,26 @@ package com.dergruenkohl.utils
 
 import com.dergruenkohl.WheatBot
 import com.dergruenkohl.api.client
+import com.dergruenkohl.config.Config
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.InputStreamReader
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Duration
@@ -157,4 +166,37 @@ fun toLevel(skill: Double): Int{
     }
     // If the XP is greater than the highest threshold, return the max level
     return levelThresholds.size - 1
+}
+/**Upload a file in an outputStream to img.dergruenkohl.com*/
+suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif"): String {
+    return try {
+        val response = client.submitFormWithBinaryData(
+            url = "https://encrypting.host/upload",
+            formData = formData {
+                append("password", Config.instance.encrypingHostPassword)
+                append("userKey", Config.instance.encryptingHostUserKey)
+                append("userStyle", "query")
+                append("domains", """["img.dergruenkohl.com"]""")
+                append("file", file.toByteArray(), Headers.build {
+                    append(HttpHeaders.ContentType, "image/gif")
+                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
+                })
+            }
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                logger.debug { "Upload progress: $bytesSentTotal/$contentLength bytes" }
+            }
+        }
+
+        val responseText = response.bodyAsText()
+        logger.info { "Upload response: $responseText" }
+
+        // Parse the response to extract the URL
+        // Adjust this based on the actual response format from encrypting.host
+        responseText
+
+    } catch (e: Exception) {
+        logger.error(e) { "Failed to upload file" }
+        throw e
+    }
 }

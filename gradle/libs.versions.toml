@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.20-Beta2"
 ktor = "3.2.3"
-jda = "6.0.0-rc.2"
+jda = "e87771b759"
 jda-emojis = "3.0.0"
 logback = "1.5.18"
 exposed = "1.0.0-beta-5"
@@ -17,12 +17,13 @@ decoroutine = "2.5.5"
 cache = "0.14.0"
 scrimage = "4.3.3"
 kotlinlogging = "7.0.10"
+javaCV = "1.5.12"
 
 
 [libraries]
-jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+# jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+jda = { module = "io.github.freya022:JDA", version.ref = "jda" }
 botcommands = {group = "com.github.freya022", name = "BotCommands", version.ref = "botcommands"}
-# com.github.freya022:BotCommands:8758b34af1
 jda-emojis = { group = "dev.freya02", name = "jda-emojis", version.ref = "jda-emojis" }
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
@@ -42,6 +43,13 @@ ktor-client-core = { group = "io.ktor", name = "ktor-client-core-jvm", version.r
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth-jvm", version.ref = "ktor" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-test = { group = "io.ktor", name = "ktor-server-test-host-jvm", version.ref = "ktor" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors-jvm", version.ref = "ktor" }
+
 
 hypixel = { group = "com.github.DerGruenkohl", name = "Hypixel-Kotlin", version.ref = "hypixel" }
 kandy-lets-plot = { group = "org.jetbrains.kotlinx", name = "kandy-lets-plot", version.ref = "kandy" }
@@ -50,6 +58,8 @@ decoroutine = { group = "dev.reformator.stacktracedecoroutinator", name = "stack
 cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.ref = "cache" }
 scrimage = { group = "com.sksamuel.scrimage", name = "scrimage-core", version.ref = "scrimage" }
 kotlinlogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinlogging" }
+javaCV-core = { group = "org.bytedeco", name = "javacv", version.ref = "javaCV" }
+ffmpeg-linux = { group = "org.bytedeco", name = "ffmpeg-platform", version.ref = "javaCV" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -69,6 +79,12 @@ ktor = [
     "ktor-client-logging",
     "ktor-client-cio",
     "ktor-client-content-negotiation",
+    "ktor-server-core",
+    "ktor-server-netty",
+    "ktor-server-auth",
+    "ktor-server-content-negotiation",
+    "ktor-server-test",
+    "ktor-server-cors"
 ]
 database = [
     "exposed-core",
@@ -90,5 +106,6 @@ misc = [
     "hypixel",
     "cache",
     "scrimage",
-    "kotlinlogging"
+    "kotlinlogging",
+    "javaCV-core",
 ]
