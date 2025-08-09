@@ -18,6 +18,7 @@ cache = "0.14.0"
 scrimage = "4.3.3"
 kotlinlogging = "7.0.10"
 javaCV = "1.5.12"
+javacpp = "1.5.10"
 
 
 [libraries]
@@ -59,13 +60,13 @@ cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.
 scrimage = { group = "com.sksamuel.scrimage", name = "scrimage-core", version.ref = "scrimage" }
 kotlinlogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinlogging" }
 javaCV-core = { group = "org.bytedeco", name = "javacv", version.ref = "javaCV" }
-ffmpeg-linux = { group = "org.bytedeco", name = "ffmpeg-platform", version.ref = "javaCV" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-seriazliation = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 updater = { id = "com.github.ben-manes.versions", version.ref = "updater" }
+javacpp = { id = "org.bytedeco.gradle-javacpp-platform", version.ref = "javacpp" }
 
 [bundles]
 jda = [

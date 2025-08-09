@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ktor)
     alias(libs.plugins.updater)
     alias(libs.plugins.kotlin.seriazliation)
+    alias(libs.plugins.javacpp)
 }
 
 group = "com.dergruenkohl"
@@ -41,6 +42,7 @@ kotlin{
         freeCompilerArgs.add("-Xcontext-receivers")
     }
 }
+
 
 
 application {
