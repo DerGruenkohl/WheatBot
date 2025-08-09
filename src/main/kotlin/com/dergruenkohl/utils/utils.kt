@@ -17,9 +17,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
+import org.apache.commons.io.output.ByteArrayOutputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.HttpURLConnection
@@ -167,6 +168,18 @@ fun toLevel(skill: Double): Int{
     // If the XP is greater than the highest threshold, return the max level
     return levelThresholds.size - 1
 }
+
+@Serializable
+data class UploadData(
+    val Url: String,
+    val DeletionUrl: String
+)
+
+@Serializable
+data class UploadResponse(
+    val data: List<UploadData>
+)
+
 /**Upload a file in an outputStream to img.dergruenkohl.com*/
 suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif"): String {
     return try {
@@ -191,9 +204,12 @@ suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif")
         val responseText = response.bodyAsText()
         logger.info { "Upload response: $responseText" }
 
-        // Parse the response to extract the URL
-        // Adjust this based on the actual response format from encrypting.host
-        responseText
+        // Parse JSON using kotlinx.serialization
+        val uploadResponse = Json.decodeFromString<UploadResponse>(responseText)
+        val url = uploadResponse.data.first().Url
+
+        logger.info { "Extracted URL: $url" }
+        url
 
     } catch (e: Exception) {
         logger.error(e) { "Failed to upload file" }

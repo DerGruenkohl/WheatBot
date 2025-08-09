@@ -1,5 +1,6 @@
 package com.dergruenkohl.commands.utility
 
+import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.StreamingGifWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
@@ -30,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 class GifCommand: ApplicationCommand() {
     private val logger = KotlinLogging.logger {  }
     @JDASlashCommand("gif", description = "create a gif from any image/video file")
-    fun createGif(event: GlobalSlashEvent,
+    suspend fun createGif(event: GlobalSlashEvent,
                   @SlashOption("file", "The file you want to convert") file: Message.Attachment,
                   @SlashOption("ephemeral", "Should the response message be ephemeral?") ephemeral: Boolean = false,
                   @SlashOption(name = "upload", description = "Upload the gif to img.dergruenkohl.com") upload: Boolean = false,
@@ -64,7 +65,20 @@ class GifCommand: ApplicationCommand() {
 //                )
 //            )
             val container = Container{
-                textDisplay("Converted file: ${file.fileName.substringBefore(".")} to gif")
+                textDisplay("## Converted file: ${file.fileName.substringBefore(".")} to gif")
+                separator(isDivider = true)
+                if(upload){
+                    val url = upload(stream)
+                    textDisplay("Upload url: $url")
+                    mediaGallery{
+                        item(url)
+                    }
+                }else{
+                    mediaGallery{
+                        item(fileUpload)
+                    }
+                }
+
             }
             event.hook.editOriginal("").setComponents(container).useComponentsV2().queue()
         } catch (e: Exception) {
