@@ -4,26 +4,33 @@ import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.StreamingGifWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
-import java.nio.file.Files
-import dev.freya02.botcommands.jda.ktx.components.MediaGalleryItem
-import dev.freya02.botcommands.jda.ktx.components.TextDisplay
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.dv8tion.jda.api.components.mediagallery.MediaGallery
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.FileUpload
 import org.apache.commons.io.output.ByteArrayOutputStream
-import org.bytedeco.javacv.FFmpegFrameGrabber
-import org.bytedeco.javacv.Java2DFrameConverter
 import java.io.OutputStream
+import org.bytedeco.ffmpeg.global.avcodec.*
+import org.bytedeco.ffmpeg.global.avformat.*
+import org.bytedeco.ffmpeg.global.avutil.*
+import org.bytedeco.ffmpeg.global.swscale.*
+import org.bytedeco.ffmpeg.avformat.*
+import org.bytedeco.ffmpeg.avcodec.*
+import org.bytedeco.ffmpeg.global.avcodec
+import org.bytedeco.ffmpeg.global.avutil
+import org.bytedeco.ffmpeg.swscale.*
+import org.bytedeco.javacv.*
 import java.net.URL
 import java.time.Duration
-import javax.imageio.ImageIO
-import javax.imageio.ImageWriteParam
+import kotlin.compareTo
+import kotlin.div
+import kotlin.text.format
+import kotlin.text.toInt
+import kotlin.times
 
 
 @Command
@@ -87,89 +94,76 @@ class GifCommand: ApplicationCommand() {
     }
 
     fun convertVideo(attachment: Message.Attachment, stream: OutputStream, progressCallback: (Int) -> Unit = {}) {
-        val tempDir = Files.createTempDirectory("gif_conversion")
-        val inputFile = tempDir.resolve("input")
-        val outputFile = tempDir.resolve("output.gif")
+        val grabber = FFmpegFrameGrabber(URL(attachment.url))
+        val converter = Java2DFrameConverter()
 
         try {
-            // Download input file
-            URL(attachment.url).openStream().use { input ->
-                Files.copy(input, inputFile)
-            }
+            grabber.start()
+            val frameRate = grabber.frameRate
+            val videoDuration = grabber.lengthInTime / 1_000_000.0
+            val targetFps = 15.0
 
-            // Build FFmpeg command with high-quality settings
-            val command = listOf(
-                "ffmpeg", "-y", "-i", inputFile.toString(),
-                "-vf", "fps=25,scale=-1:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle",
-                "-loop", "0",
-                outputFile.toString()
-            )
+            val totalFramesToExtract = (videoDuration * targetFps).toInt()
+            val frameSkip = (frameRate / targetFps).toInt().coerceAtLeast(1)
+            val frameDelayMs = (1000.0 / targetFps).toLong()
 
-            val process = ProcessBuilder(command)
-                .redirectErrorStream(true)
-                .start()
+            val writer = StreamingGifWriter(Duration.ofMillis(frameDelayMs), true, false)
+            val gif = writer.prepareStream(stream, java.awt.image.BufferedImage.TYPE_INT_RGB)
 
-            // Monitor progress by reading FFmpeg output
-            process.inputStream.bufferedReader().use { reader ->
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    line?.let {
-                        // Parse FFmpeg progress output if needed
-                        if (it.contains("time=")) {
-                            // Extract progress and call progressCallback
-                        }
+            var frameNumber = 0
+            var extractedFrames = 0
+            var frame = grabber.grabFrame()
+            var lastProgress = -1
+
+            while (frame != null && extractedFrames < totalFramesToExtract) {
+                if (frameNumber % frameSkip == 0 && frame.image != null) {
+                    val bufferedImage = converter.convert(frame)
+                    val immutableImage = ImmutableImage.fromAwt(bufferedImage)
+
+                    gif.writeFrame(immutableImage)
+                    extractedFrames++
+
+                    // Update progress every 5%
+                    val progress = (extractedFrames * 100) / totalFramesToExtract
+                    if (progress != lastProgress && progress % 5 == 0) {
+                        progressCallback(progress)
+                        lastProgress = progress
                     }
                 }
+                frame = grabber.grabFrame()
+                frameNumber++
             }
 
-            val exitCode = process.waitFor()
-            if (exitCode == 0) {
-                Files.copy(outputFile, stream)
-            } else {
-                throw RuntimeException("FFmpeg conversion failed with exit code: $exitCode")
-            }
+            gif.close()
 
         } finally {
-            // Cleanup temp files
-            Files.deleteIfExists(inputFile)
-            Files.deleteIfExists(outputFile)
-            Files.deleteIfExists(tempDir)
+            grabber.stop()
+            grabber.release()
         }
     }
 
     fun convertImage(attachment: Message.Attachment, stream: OutputStream) {
-        val tempDir = Files.createTempDirectory("gif_conversion")
-        val inputFile = tempDir.resolve("input")
-        val outputFile = tempDir.resolve("output.gif")
+        val inputUrl = attachment.url
+
+        val converter = Java2DFrameConverter()
+        val bufferedImage = javax.imageio.ImageIO.read(URL(inputUrl))
+        val frame = converter.convert(bufferedImage)
+
+        val recorder = FFmpegFrameRecorder(stream, frame.imageWidth, frame.imageHeight).apply {
+            format = "webp"
+            videoCodec = avcodec.AV_CODEC_ID_WEBP
+            pixelFormat = avutil.AV_PIX_FMT_YUV420P
+            frameRate = 1.0
+            start()
+        }
 
         try {
-            // Download input file
-            URL(attachment.url).openStream().use { input ->
-                Files.copy(input, inputFile)
+            repeat(2) {
+                recorder.record(frame)
             }
-
-            // Build FFmpeg command for single image
-            val command = listOf(
-                "ffmpeg", "-y", "-i", inputFile.toString(),
-                "-vf", "scale=-1:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:stats_mode=single[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3",
-                "-t", "1",
-                outputFile.toString()
-            )
-
-            val process = ProcessBuilder(command).start()
-            val exitCode = process.waitFor()
-
-            if (exitCode == 0) {
-                Files.copy(outputFile, stream)
-            } else {
-                throw RuntimeException("FFmpeg conversion failed with exit code: $exitCode")
-            }
-
         } finally {
-            // Cleanup temp files
-            Files.deleteIfExists(inputFile)
-            Files.deleteIfExists(outputFile)
-            Files.deleteIfExists(tempDir)
+            recorder.stop()
+            recorder.release()
         }
     }
 }

@@ -47,6 +47,26 @@ fun CoroutineScope.scheduleRepeating(
         }
     }
 }
+fun CoroutineScope.scheduleDaily(
+    time: LocalTime,
+    timeZone: ZoneId = ZoneId.systemDefault(),
+    block: suspend () -> Unit
+): Job {
+    return launch {
+        val now = LocalDateTime.now(timeZone)
+        val nextRun = now.withHour(time.hour).withMinute(time.minute).withSecond(time.second).withNano(0)
+            .let {
+                if (it.isBefore(now)) it.plusDays(1) else it
+            }
+        logger.info { "Scheduled daily task for $nextRun" }
+        val initialDelay = java.time.Duration.between(now, nextRun).toMillis()
+        delay(initialDelay)
+        while (isActive) {
+            block()
+            delay(TimeUnit.DAYS.toMillis(1))
+        }
+    }
+}
 fun CoroutineScope.scheduleWeekly(
     dayOfWeek: DayOfWeek,
     time: LocalTime,
