@@ -13,6 +13,7 @@ import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import com.dergruenkohl.utils.database.UptimeRepo
 import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
+import org.jetbrains.exposed.v1.core.eq
 
 
 fun Route.userRoutes() {

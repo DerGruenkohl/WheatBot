@@ -16,7 +16,7 @@ class TestCommand: ApplicationCommand() {
     @JDASlashCommand("test", description = "test command")
     fun test(event: GuildSlashEvent) {
         val container = Container {
-            textDisplay("test")
+            text("test")
         }
         event.replyComponents(container)
             .useComponentsV2()

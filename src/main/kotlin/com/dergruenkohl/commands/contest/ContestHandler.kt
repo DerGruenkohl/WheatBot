@@ -3,8 +3,8 @@ package com.dergruenkohl.commands.contest
 import com.dergruenkohl.api.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.datetime.DayOfWeek
 import kotlinx.serialization.Serializable
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

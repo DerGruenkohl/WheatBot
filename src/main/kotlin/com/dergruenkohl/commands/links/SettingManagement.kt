@@ -3,6 +3,7 @@ package com.dergruenkohl.commands.links
 import com.dergruenkohl.utils.database.LinkRepo
 import com.dergruenkohl.utils.database.Settings
 import com.dergruenkohl.utils.ErrorHandler
+import dev.freya02.botcommands.jda.ktx.components.TextInput
 import dev.freya02.botcommands.jda.ktx.components.row
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.annotations.Command
@@ -20,9 +21,9 @@ import io.github.freya022.botcommands.api.modals.Modals
 import io.github.freya022.botcommands.api.modals.annotations.ModalHandler
 import io.github.freya022.botcommands.api.modals.annotations.ModalInput
 import io.github.freya022.botcommands.api.modals.create
-import io.github.freya022.botcommands.api.modals.shortTextInput
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 
 @Command
 class SettingManagement(private val buttons: Buttons, private val modals: Modals): ApplicationCommand() {
@@ -70,11 +71,8 @@ class SettingManagement(private val buttons: Buttons, private val modals: Modals
     suspend fun handleText(event: ButtonEvent){
         val link = LinkRepo.getLink(event.user.idLong)?: return
         val modal = modals.create("TextColor"){
-            shortTextInput("color", "Enter a Hex Color"){
-                isRequired = true
-                placeholder = "FFFFFF"
-                maxLength = 6
-                minLength = 6
+            label("Enter a Hex Color Code"){
+                child = TextInput("color", TextInputStyle.SHORT, isRequired = true, placeholder = "FFFFFF")
             }
             bindTo("TextColor")
         }
