@@ -3,6 +3,7 @@ package com.dergruenkohl.commands.utility
 import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.StreamingGifWriter
+import com.sksamuel.scrimage.webp.WebpWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
@@ -14,23 +15,9 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.FileUpload
 import org.apache.commons.io.output.ByteArrayOutputStream
 import java.io.OutputStream
-import org.bytedeco.ffmpeg.global.avcodec.*
-import org.bytedeco.ffmpeg.global.avformat.*
-import org.bytedeco.ffmpeg.global.avutil.*
-import org.bytedeco.ffmpeg.global.swscale.*
-import org.bytedeco.ffmpeg.avformat.*
-import org.bytedeco.ffmpeg.avcodec.*
-import org.bytedeco.ffmpeg.global.avcodec
-import org.bytedeco.ffmpeg.global.avutil
-import org.bytedeco.ffmpeg.swscale.*
 import org.bytedeco.javacv.*
 import java.net.URL
 import java.time.Duration
-import kotlin.compareTo
-import kotlin.div
-import kotlin.text.format
-import kotlin.text.toInt
-import kotlin.times
 
 
 @Command
@@ -109,7 +96,6 @@ class GifCommand: ApplicationCommand() {
 
             val writer = StreamingGifWriter(Duration.ofMillis(frameDelayMs), true, false)
             val gif = writer.prepareStream(stream, java.awt.image.BufferedImage.TYPE_INT_RGB)
-
             var frameNumber = 0
             var extractedFrames = 0
             var frame = grabber.grabFrame()
@@ -144,26 +130,10 @@ class GifCommand: ApplicationCommand() {
 
     fun convertImage(attachment: Message.Attachment, stream: OutputStream) {
         val inputUrl = attachment.url
+        val image = ImmutableImage.loader().fromUrl(URL(inputUrl))
 
-        val converter = Java2DFrameConverter()
-        val bufferedImage = javax.imageio.ImageIO.read(URL(inputUrl))
-        val frame = converter.convert(bufferedImage)
 
-        val recorder = FFmpegFrameRecorder(stream, frame.imageWidth, frame.imageHeight).apply {
-            format = "webp"
-            videoCodec = avcodec.AV_CODEC_ID_WEBP
-            pixelFormat = avutil.AV_PIX_FMT_YUV420P
-            frameRate = 1.0
-            start()
-        }
-
-        try {
-            repeat(2) {
-                recorder.record(frame)
-            }
-        } finally {
-            recorder.stop()
-            recorder.release()
-        }
+        val writer = WebpWriter.DEFAULT.withLossless()
+        writer.write(image, image.metadata, stream)
     }
 }

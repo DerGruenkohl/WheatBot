@@ -49,7 +49,7 @@ object Uptime: ApplicationCommand() {
 
             val uptime = getCachedUptime(ign, link) ?: return event.hook.editOriginalEmbeds(Embed {
                 title = "Error"
-                description = "Could not get uptime for $name"
+                description = "Could not get uptime for $name, are they in a guild?"
             }).queue()
             val imgBytes = uptime.bytes(writer)
             hook.await()
