@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.20-Beta2"
+kotlin = "2.3.20-Beta1"
 ktor = "3.2.3"
 jda = "6.3.0"
 jda-emojis = "3.0.0"
