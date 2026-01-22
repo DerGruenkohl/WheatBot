@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Message.Attachment
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.utils.FileUpload
 import java.io.ByteArrayOutputStream
+import java.net.URI
 import java.net.URL
 import javax.imageio.ImageIO
 
@@ -50,7 +51,7 @@ class UploadCommand(private val buttons: Buttons) : ApplicationCommand() {
 
         val os = ByteArrayOutputStream()
         withContext(WheatBot.IOContext) {
-            ImageIO.write(ImageIO.read(URL(file.url)), "png", os)
+            ImageIO.write(ImageIO.read(URI(file.url).toURL()), "png", os)
         }
 
         channel.sendMessage(event.user.id)

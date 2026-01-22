@@ -37,10 +37,7 @@ tasks.withType<ShadowJar> {
 }
 
 kotlin{
-    jvmToolchain(21)
-    compilerOptions {
-
-    }
+    jvmToolchain(25)
 }
 
 

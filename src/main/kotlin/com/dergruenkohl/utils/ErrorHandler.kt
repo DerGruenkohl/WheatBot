@@ -15,16 +15,7 @@ object ErrorHandler {
         .setColor(Color.RED)
         .setFooter("Have this cat :)")
 
-    fun handle(msg: String, hook: InteractionHook) {
-        hook.editOriginal("")
-            .setEmbeds(
-                errorEmbed
-                    .setDescription(msg)
-                    .setImage(getMeow())
-                    .setFooter("discord.gg/ebxgyjhA5u")
-                    .build()
-            ).queue()
-    }
+
     suspend fun handle(e: Exception, hook: InteractionHook, msg: String = "") {
         when(e) {
             is HttpRequestTimeoutException, is ConnectException -> {
@@ -32,7 +23,7 @@ object ErrorHandler {
                     .setEmbeds(
                         errorEmbed
                             .setDescription("Failed to connect to the API, please try again later")
-                            .setImage(getMeow())
+                            .setImage(getCat())
                             .build()
                     ).queue()
             }
@@ -41,7 +32,7 @@ object ErrorHandler {
                     .setEmbeds(
                         errorEmbed
                             .setDescription("Failed to generate an Image")
-                            .setImage(getMeow())
+                            .setImage(getCat())
                             .build()
                     ).queue()
             }
@@ -50,7 +41,7 @@ object ErrorHandler {
                     .setEmbeds(
                         errorEmbed
                             .setDescription("Api request failed: ${e.response.bodyAsText()}")
-                            .setImage(getMeow())
+                            .setImage(getCat())
                             .build()
                     ).queue()
             }
@@ -59,7 +50,7 @@ object ErrorHandler {
                     .setEmbeds(
                         errorEmbed
                             .setDescription("An error occurred")
-                            .setImage(getMeow())
+                            .setImage(getCat())
                             .build()
                     ).queue()
             }
