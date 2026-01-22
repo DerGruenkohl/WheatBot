@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.20-Beta2"
 ktor = "3.2.3"
-jda = "e87771b759"
+jda = "6.3.0"
 jda-emojis = "3.0.0"
 logback = "1.5.18"
 exposed = "1.0.0-beta-5"
@@ -10,7 +10,7 @@ flyway = "11.10.5"
 hikari = "7.0.0"
 h2 = "2.3.232"
 mariadb = "3.5.4"
-botcommands = "feature~components-v2-SNAPSHOT"
+botcommands = "3.0.0-beta.7"
 kandy = "0.8.1-local-1-dev-64"
 updater = "0.52.0"
 decoroutine = "2.5.5"
@@ -22,9 +22,9 @@ javacpp = "1.5.10"
 
 
 [libraries]
-# jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
-jda = { module = "io.github.freya022:JDA", version.ref = "jda" }
-botcommands = {group = "com.github.freya022", name = "BotCommands", version.ref = "botcommands"}
+jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+botcommands-core = {group = "io.github.freya022", name = "BotCommands-core", version.ref = "botcommands"}
+botcommands-ktx = {group = "io.github.freya022", name = "BotCommands-jda-ktx", version.ref = "botcommands"}
 jda-emojis = { group = "dev.freya02", name = "jda-emojis", version.ref = "jda-emojis" }
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
@@ -72,7 +72,8 @@ javacpp = { id = "org.bytedeco.gradle-javacpp-platform", version.ref = "javacpp"
 jda = [
     "jda-emojis",
     "jda",
-    "botcommands"
+    "botcommands-core",
+    "botcommands-ktx"
 ]
 ktor = [
     "ktor-serialization",

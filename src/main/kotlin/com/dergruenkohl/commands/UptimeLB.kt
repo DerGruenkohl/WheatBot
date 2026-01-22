@@ -7,6 +7,7 @@ import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
 import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.getUsernames
+import dev.freya02.botcommands.jda.ktx.components.TextInput
 import dev.freya02.botcommands.jda.ktx.components.row
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import dev.freya02.botcommands.jda.ktx.messages.Embed
@@ -25,9 +26,9 @@ import io.github.freya022.botcommands.api.modals.Modals
 import io.github.freya022.botcommands.api.modals.annotations.ModalHandler
 import io.github.freya022.botcommands.api.modals.annotations.ModalInput
 import io.github.freya022.botcommands.api.modals.create
-import io.github.freya022.botcommands.api.modals.shortTextInput
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDate
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.utils.FileUpload
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -128,7 +129,9 @@ class UptimeLB(private val buttons: Buttons, private val modals: Modals): Applic
     @JDAButtonListener
     suspend fun searchForIGN(event: ButtonEvent){
         val modal = modals.create("Search for IGN") {
-            shortTextInput("ign", "Minecraft IGN")
+            label("ign"){
+                child = TextInput("ign", TextInputStyle.SHORT, isRequired = true)
+            }
             bindTo("ignsearch")
         }
         event.replyModal(modal).await()

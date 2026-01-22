@@ -71,11 +71,11 @@ class GifCommand: ApplicationCommand() {
 //                )
 //            )
             val container = Container{
-                textDisplay("## Converted file: ${file.fileName.substringBefore(".")} to gif")
+                text("## Converted file: ${file.fileName.substringBefore(".")} to gif")
                 separator(isDivider = true)
                 if(upload){
                     val url = upload(stream)
-                    textDisplay("Upload url: $url")
+                    text("Upload url: $url")
                     mediaGallery{
                         item(url)
                     }
