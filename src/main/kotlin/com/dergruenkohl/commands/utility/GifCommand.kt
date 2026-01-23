@@ -11,6 +11,7 @@ import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlash
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.server.util.url
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.FileUpload
 import org.apache.commons.io.output.ByteArrayOutputStream
@@ -21,6 +22,7 @@ import java.io.File
 import java.net.URI
 import java.net.URL
 import java.time.Duration
+import java.util.UUID
 
 
 @Command
@@ -28,17 +30,31 @@ class GifCommand: ApplicationCommand() {
     private val logger = KotlinLogging.logger {  }
     @JDASlashCommand("gif", description = "create a gif from any image/video file")
     suspend fun createGif(event: GlobalSlashEvent,
-                  @SlashOption("file", "The file you want to convert") file: Message.Attachment,
+                  @SlashOption("file", "The file you want to convert") file: Message.Attachment?,
+                  @SlashOption("url", "The url of the file you want to convert") url: String? = null,
                   @SlashOption("ephemeral", "Should the response message be ephemeral?") ephemeral: Boolean = false,
-                  @SlashOption(name = "upload", description = "Upload the gif to img.dergruenkohl.com") upload: Boolean = false,
+                  @SlashOption(name = "upload", description = "Upload the gif to catbox.moe") upload: Boolean = false,
     ) {
         try {
-            logger.info { "Converting ${file.fileName}" }
-            event.reply("Converting...").setEphemeral(ephemeral).queue()
-            if (!file.isImage && !file.isVideo){
-                event.hook.editOriginal("File type is not supported").queue()
+
+            if(file == null && url == null) {
+                event.reply("You must provide either a file or a url").setEphemeral(ephemeral).queue()
                 return
             }
+            if (file != null && url != null){
+                event.reply("You can only provide either a file or a url").setEphemeral(ephemeral).queue()
+                return
+            }
+            if (file!= null){
+                logger.info { "Converting ${file.fileName}" }
+
+
+                if (!file.isImage && !file.isVideo){
+                    event.hook.editOriginal("File type is not supported").queue()
+                    return
+                }
+            }
+            event.reply("Converting...").setEphemeral(ephemeral).queue()
             val stream = ByteArrayOutputStream()
 
             // Create progress callback
@@ -46,22 +62,11 @@ class GifCommand: ApplicationCommand() {
                 val progressBar = "█".repeat(progress / 5) + "░".repeat(20 - progress / 5)
                 event.hook.editOriginal("Converting... [$progressBar] $progress%").queue()
             }
-            convertVideoWithRecoder(file, stream, progressCallback)
-//            if (file.isImage) {
-//                convertImage(file, stream)
-//            } else {
-//                convertVideo(file, stream, progressCallback)
-//            }
+            convertVideoWithRecoder(file?.url?: url!!, stream, progressCallback)
 
             val fileUpload = FileUpload.fromData(stream.toByteArray(), "meow.gif")
-//            val container = Container.of (
-//                TextDisplay("Converted file: ${file.fileName} to gif"),
-//                MediaGallery.of(
-//                    MediaGalleryItem(fileUpload)
-//                )
-//            )
             val container = Container{
-                text("## Converted file: ${file.fileName.substringBefore(".")} to gif")
+                text("## Converted file: ${(file?.fileName)?:"input" .substringBefore(".")} to gif")
                 separator(isDivider = true)
                 if(upload){
                     val url = upload(stream)
@@ -82,14 +87,19 @@ class GifCommand: ApplicationCommand() {
             event.hook.editOriginal("An error occurred while converting").queue()
         }
     }
-    fun convertVideoWithRecoder(attachment: Message.Attachment, stream: OutputStream, progressCallback: (Int) -> Unit = {}){
-        val file = File("images/temp/${attachment.idLong}.gif")
+    fun convertVideoWithRecoder(url: String, stream: OutputStream, progressCallback: (Int) -> Unit = {}){
+        if(url.substringAfterLast(".").substring(0..2).contains("gif")){
+            val inputStream = URI(url).toURL().openStream()
+            inputStream.copyTo(stream)
+            inputStream.close()
+            return
+        }
+        val file = File("images/temp/${UUID.randomUUID()}.gif")
         file.createNewFile()
         try {
-            val grabber = FFmpegFrameGrabber(URI(attachment.url).toURL())
+            val grabber = FFmpegFrameGrabber(URI(url).toURL())
             grabber.start()
-
-            val recorder = FFmpegFrameRecorder.createDefault(file, attachment.width, attachment.height)
+            val recorder = FFmpegFrameRecorder.createDefault(file, grabber.imageWidth, grabber.imageHeight)
             recorder.pixelFormat = avutil.AV_PIX_FMT_RGB8
             recorder.frameRate = grabber.frameRate // Match input frame rate
             recorder.start()
@@ -100,6 +110,7 @@ class GifCommand: ApplicationCommand() {
             logger.info { "input frames: ${grabber.lengthInFrames}" }
 
             var frame = grabber.grabFrame(false, true, true, false)
+            val firstFrame = frame.clone()
             while (frame != null) {
                 recorder.record(frame)
                 frame = grabber.grabFrame(false, true, true, false)
@@ -107,13 +118,18 @@ class GifCommand: ApplicationCommand() {
                 // Update progress every 5%
                 val progress = (extractedFrames * 100) / totalFramesToExtract
                 if (progress != lastProgress && progress % 5 == 0) {
-                    progressCallback(progress)
+                    progressCallback(progress.coerceIn(1..100))
                     lastProgress = progress
                 }
+            }
+            logger.info { "Extracted frames: $extractedFrames" }
+            if (extractedFrames == 1){
+                recorder.record(firstFrame)
             }
             progressCallback(100)
             recorder.stop()
             grabber.stop()
+            firstFrame.close()
             val inputStream = file.inputStream()
             inputStream.copyTo(stream)
             inputStream.close()
@@ -121,6 +137,7 @@ class GifCommand: ApplicationCommand() {
         } catch (e: Exception) {
             logger.error(e) { "Error while converting" }
             file.delete()
+            throw e
         }
     }
 

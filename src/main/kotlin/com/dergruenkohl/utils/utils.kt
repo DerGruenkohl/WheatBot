@@ -184,15 +184,22 @@ data class UploadResponse(
 suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif"): String {
     return try {
         val response = client.submitFormWithBinaryData(
-            url = "https://encrypting.host/upload",
+            //url = "https://encrypting.host/upload",
+//            formData = formData {
+//                append("password", Config.instance.encrypingHostPassword)
+//                append("userKey", Config.instance.encryptingHostUserKey)
+//                append("userStyle", "embed")
+//                append("domains", """["img.dergruenkohl.com"]""")
+//                append("file", file.toByteArray(), Headers.build {
+//                    append(HttpHeaders.ContentType, "image/gif")
+//                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
+//                })
+//            }
+            url = "https://catbox.moe/user/api.php ",
             formData = formData {
-                append("password", Config.instance.encrypingHostPassword)
-                append("userKey", Config.instance.encryptingHostUserKey)
-                append("userStyle", "query")
-                append("domains", """["img.dergruenkohl.com"]""")
-                append("file", file.toByteArray(), Headers.build {
-                    append(HttpHeaders.ContentType, "image/gif")
-                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
+                append("reqtype", "fileupload")
+                append("fileToUpload", file.toByteArray(), Headers.build {
+                    append(HttpHeaders.ContentDisposition, "filename=$fileName")
                 })
             }
         ) {
@@ -205,8 +212,9 @@ suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif")
         logger.info { "Upload response: $responseText" }
 
         // Parse JSON using kotlinx.serialization
-        val uploadResponse = Json.decodeFromString<UploadResponse>(responseText)
-        val url = uploadResponse.data.first().Url
+ //       val uploadResponse = Json.decodeFromString<UploadResponse>(responseText)
+ //       val url = uploadResponse.data.first().Url
+        val url = responseText
 
         logger.info { "Extracted URL: $url" }
         url
