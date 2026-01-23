@@ -4,7 +4,6 @@ import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.GifWriter
 import com.sksamuel.scrimage.nio.StreamingGifWriter
-import com.sksamuel.scrimage.webp.WebpWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
 import io.github.freya022.botcommands.api.commands.annotations.Command
 import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
@@ -172,10 +171,4 @@ class GifCommand: ApplicationCommand() {
         }
     }
 
-    fun convertImage(attachment: Message.Attachment, stream: OutputStream) {
-        val inputUrl = attachment.proxyUrl
-        val image = ImmutableImage.loader().fromUrl(URI(inputUrl).toURL())
-        val writer = WebpWriter.DEFAULT.withLossless()
-        GifWriter.Progressive.write(image, image.metadata, stream)
-    }
 }

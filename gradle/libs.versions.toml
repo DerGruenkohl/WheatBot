@@ -58,7 +58,6 @@ kandy-api = { group = "org.jetbrains.kotlinx", name = "kandy-api", version.ref =
 decoroutine = { group = "dev.reformator.stacktracedecoroutinator", name = "stacktrace-decoroutinator-jvm", version.ref = "decoroutine" }
 cache = { group = "io.github.reactivecircus.cache4k", name = "cache4k", version.ref = "cache" }
 scrimage = { group = "com.sksamuel.scrimage", name = "scrimage-core", version.ref = "scrimage" }
-scrimage-webp = { group = "com.sksamuel.scrimage", name = "scrimage-webp", version.ref = "scrimage" }
 kotlinlogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinlogging" }
 javaCV-core = { group = "org.bytedeco", name = "javacv", version.ref = "javaCV" }
 
@@ -109,7 +108,6 @@ misc = [
     "hypixel",
     "cache",
     "scrimage",
-    "scrimage-webp",
     "kotlinlogging",
     "javaCV-core",
 ]
