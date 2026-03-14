@@ -1,8 +1,8 @@
 package com.dergruenkohl.commands.utility
 
+import com.dergruenkohl.utils.isImageUrl
 import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
-import com.sksamuel.scrimage.nio.GifWriter
 import com.sksamuel.scrimage.nio.StreamingGifWriter
 import com.sksamuel.scrimage.webp.WebpWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
@@ -12,7 +12,6 @@ import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlash
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.server.util.url
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.FileUpload
 import org.apache.commons.io.output.ByteArrayOutputStream
@@ -21,7 +20,6 @@ import java.io.OutputStream
 import org.bytedeco.javacv.*
 import java.io.File
 import java.net.URI
-import java.net.URL
 import java.time.Duration
 import java.util.UUID
 
@@ -34,7 +32,7 @@ class GifCommand: ApplicationCommand() {
                   @SlashOption("file", "The file you want to convert") file: Message.Attachment?,
                   @SlashOption("url", "The url of the file you want to convert") url: String? = null,
                   @SlashOption("ephemeral", "Should the response message be ephemeral?") ephemeral: Boolean = false,
-                  @SlashOption(name = "upload", description = "Upload the gif to catbox.moe") upload: Boolean = false,
+                  @SlashOption(name = "upload", description = "Upload the gif to img.dergruenkohl.com") upload: Boolean = false,
     ) {
         try {
 
@@ -63,7 +61,13 @@ class GifCommand: ApplicationCommand() {
                 val progressBar = "█".repeat(progress / 5) + "░".repeat(20 - progress / 5)
                 event.hook.editOriginal("Converting... [$progressBar] $progress%").queue()
             }
-            convertVideoWithRecoder(file?.url?: url!!, stream, progressCallback)
+            val fileurl = file?.url?: url!!
+            if (fileurl.isImageUrl() && upload){
+                convertImage(fileurl, stream)
+            } else {
+                convertVideoWithRecoder(fileurl, stream, progressCallback)
+            }
+
 
             val fileUpload = FileUpload.fromData(stream.toByteArray(), "meow.gif")
             val container = Container{
@@ -130,6 +134,8 @@ class GifCommand: ApplicationCommand() {
             progressCallback(100)
             recorder.stop()
             grabber.stop()
+            grabber.release()
+            recorder.release()
             firstFrame.close()
             val inputStream = file.inputStream()
             inputStream.copyTo(stream)
@@ -189,10 +195,10 @@ class GifCommand: ApplicationCommand() {
         }
     }
 
-    fun convertImage(attachment: Message.Attachment, stream: OutputStream) {
-        val inputUrl = attachment.proxyUrl
-        val image = ImmutableImage.loader().fromUrl(URI(inputUrl).toURL())
+    fun convertImage(url: String, stream: OutputStream) {
+        val image = ImmutableImage.loader().fromUrl(URI(url).toURL())
         val writer = WebpWriter.DEFAULT.withLossless()
-        GifWriter.Progressive.write(image, image.metadata, stream)
+        writer.write(image, image.metadata, stream)
     }
+
 }

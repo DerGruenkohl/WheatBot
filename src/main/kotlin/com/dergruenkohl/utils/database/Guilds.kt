@@ -144,7 +144,7 @@ object GuildRepo {
     }
 
     private fun getGuildsToUpdate(): List<String> {
-        val sixHoursAgo = System.currentTimeMillis() - 36.hours.inWholeMilliseconds
+        val sixHoursAgo = System.currentTimeMillis() - 24.hours.inWholeMilliseconds
         return transaction {
             GuildEntity.find { GuildTable.lastUpdated lessEq sixHoursAgo }.map { it.guildId }
         }

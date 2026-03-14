@@ -6,23 +6,19 @@ import com.dergruenkohl.config.Config
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
-import io.ktor.client.plugins.onUpload
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.forms.submitFormWithBinaryData
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.MessageEmbed
-import java.io.BufferedReader
 import org.apache.commons.io.output.ByteArrayOutputStream
+import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Duration
@@ -184,24 +180,24 @@ data class UploadResponse(
 suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif"): String {
     return try {
         val response = client.submitFormWithBinaryData(
-            //url = "https://encrypting.host/upload",
-//            formData = formData {
-//                append("password", Config.instance.encrypingHostPassword)
-//                append("userKey", Config.instance.encryptingHostUserKey)
-//                append("userStyle", "embed")
-//                append("domains", """["img.dergruenkohl.com"]""")
-//                append("file", file.toByteArray(), Headers.build {
-//                    append(HttpHeaders.ContentType, "image/gif")
-//                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
-//                })
-//            }
-            url = "https://catbox.moe/user/api.php ",
+            url = "https://encrypting.host/upload",
             formData = formData {
-                append("reqtype", "fileupload")
-                append("fileToUpload", file.toByteArray(), Headers.build {
-                    append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                append("password", Config.instance.encrypingHostPassword)
+                append("userKey", Config.instance.encryptingHostUserKey)
+                append("userStyle", "embed")
+                append("domains", """["img.dergruenkohl.com"]""")
+                append("file", file.toByteArray(), Headers.build {
+                    append(HttpHeaders.ContentType, "image/gif")
+                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
                 })
             }
+//            url = "https://catbox.moe/user/api.php ",
+//            formData = formData {
+//                append("reqtype", "fileupload")
+//                append("fileToUpload", file.toByteArray(), Headers.build {
+//                    append(HttpHeaders.ContentDisposition, "filename=$fileName")
+//                })
+//            }
         ) {
             onUpload { bytesSentTotal, contentLength ->
                 logger.debug { "Upload progress: $bytesSentTotal/$contentLength bytes" }
@@ -212,9 +208,9 @@ suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif")
         logger.info { "Upload response: $responseText" }
 
         // Parse JSON using kotlinx.serialization
- //       val uploadResponse = Json.decodeFromString<UploadResponse>(responseText)
- //       val url = uploadResponse.data.first().Url
-        val url = responseText
+        val uploadResponse = Json.decodeFromString<UploadResponse>(responseText)
+        val url = uploadResponse.data.first().Url
+ //       val url = responseText
 
         logger.info { "Extracted URL: $url" }
         url
@@ -223,4 +219,13 @@ suspend fun upload(file: ByteArrayOutputStream, fileName: String = "upload.gif")
         logger.error(e) { "Failed to upload file" }
         throw e
     }
+
+}
+fun String.getFileExtension(): String {
+    return this.substringAfterLast(".").substring(0..2)
+}
+fun String.isImageUrl(): Boolean {
+    val fileExtension = getFileExtension()?: return false
+    val imageExtensions = listOf("png", "jpg", "jpeg", "bmp", "webp", "tiff", "svg")
+    return imageExtensions.any { it.equals(fileExtension, ignoreCase = true) }
 }

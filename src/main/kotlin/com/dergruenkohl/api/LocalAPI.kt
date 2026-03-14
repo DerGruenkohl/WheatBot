@@ -26,6 +26,15 @@ val client by lazy {
                 ignoreUnknownKeys = true
             })
         }
+        engine {
+            endpoint {
+                connectTimeout = 10_000
+                requestTimeout = 60_000
+                keepAliveTime = 5_000
+                pipelineMaxSize = 20
+                socketTimeout = 10_000
+            }
+        }
     }
 }
 val hypixelClient by lazy {

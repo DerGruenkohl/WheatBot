@@ -2,10 +2,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.ktor)
+    alias(libs.plugins.shadow)
     alias(libs.plugins.updater)
     alias(libs.plugins.kotlin.seriazliation)
     alias(libs.plugins.javacpp)
+    application
 }
 
 group = "com.dergruenkohl"
@@ -33,6 +34,7 @@ tasks.test {
 tasks.withType<ShadowJar> {
     mergeServiceFiles()
     archiveFileName.set("WheatBot.jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     isZip64 = true
 }
 

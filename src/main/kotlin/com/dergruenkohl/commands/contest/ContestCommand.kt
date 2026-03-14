@@ -32,10 +32,10 @@ object ContestCommand: ApplicationCommand() {
 
             contestMap.forEach { (hour, count) ->
                 if (contestMap.values.max() < 10) {
-                    builder.append("[${"█".repeat(count)}] (**$count**) \n")
+                    builder.append("$hour:00-$hour:59 UTC [${"█".repeat(count)}] (**$count**) \n")
                 } else {
                     val scale = (contestMap.values.maxOrNull() ?: 10) / 10
-                    builder.append("[${"█".repeat(count / scale)}] (**$count**) \n")
+                    builder.append("$hour:00-$hour:59 UTC [${"█".repeat(count / scale)}] (**$count**) \n")
                 }
             }
             embed.setDescription(builder.toString())
