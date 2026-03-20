@@ -7,7 +7,6 @@ import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUsername
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.CommandScope
 import io.github.freya022.botcommands.api.commands.application.annotations.Test
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
@@ -17,7 +16,7 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 @Command
-class StatCommand(private val gen: StatGenerator): ApplicationCommand() {
+class StatCommand(private val gen: StatGenerator) {
     private val logger = KotlinLogging.logger {}
 
     @Test

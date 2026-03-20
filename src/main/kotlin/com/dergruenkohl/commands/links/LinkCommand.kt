@@ -12,7 +12,6 @@ import com.dergruenkohl.utils.getMinecraftUsername
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -20,7 +19,7 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 @Command
-object LinkCommand: ApplicationCommand() {
+object LinkCommand {
     private val logger = KotlinLogging.logger {  }
 
     @TopLevelSlashCommandData(description = "Manage Links")

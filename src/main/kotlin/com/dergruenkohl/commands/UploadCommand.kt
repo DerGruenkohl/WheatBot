@@ -6,7 +6,6 @@ import com.dergruenkohl.config.Environment
 import dev.freya02.botcommands.jda.ktx.components.row
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -25,7 +24,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 @Command
-class UploadCommand(private val buttons: Buttons) : ApplicationCommand() {
+class UploadCommand(private val buttons: Buttons) {
     @JDASlashCommand(name = "upload")
     suspend fun onUpload(
         event: GlobalSlashEvent,
@@ -80,7 +79,7 @@ class UploadCommand(private val buttons: Buttons) : ApplicationCommand() {
                 folder.mkdirs()
             }
             val img = folder.resolve("${user.id}.${file.fileExtension}")
-            img.writeBytes(URL(file.url).readBytes())
+            img.writeBytes(URI(file.url).toURL().readBytes())
             user.openPrivateChannel().queue { it.sendMessage("Approved your uploaded image(${file.fileName})").queue() }
         } else {
             event.reply("Denied").queue()

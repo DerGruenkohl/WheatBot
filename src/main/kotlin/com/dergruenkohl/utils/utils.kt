@@ -20,6 +20,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -110,7 +111,7 @@ suspend fun getCat(): String{
 
 fun getMeow() : String{
     val apiUrl = "https://api.thecatapi.com/v1/images/search"
-    val url = URL(apiUrl)
+    val url = URI(apiUrl).toURL()
     val connection = url.openConnection() as HttpURLConnection
     connection.requestMethod = "GET"
     val responseCode = connection.responseCode
@@ -225,7 +226,7 @@ fun String.getFileExtension(): String {
     return this.substringAfterLast(".").substring(0..2)
 }
 fun String.isImageUrl(): Boolean {
-    val fileExtension = getFileExtension()?: return false
+    val fileExtension = getFileExtension()
     val imageExtensions = listOf("png", "jpg", "jpeg", "bmp", "webp", "tiff", "svg")
     return imageExtensions.any { it.equals(fileExtension, ignoreCase = true) }
 }

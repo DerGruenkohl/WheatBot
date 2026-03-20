@@ -7,7 +7,6 @@ import dev.freya02.botcommands.jda.ktx.components.TextInput
 import dev.freya02.botcommands.jda.ktx.components.row
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.components.Buttons
@@ -26,7 +25,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.textinput.TextInputStyle
 
 @Command
-class SettingManagement(private val buttons: Buttons, private val modals: Modals): ApplicationCommand() {
+class SettingManagement(private val buttons: Buttons, private val modals: Modals) {
     private val logger = KotlinLogging.logger {  }
     @JDASlashCommand("link", description = "Manage your link settings", subcommand = "manage")
     suspend fun onLinkManage(event: GlobalSlashEvent) {

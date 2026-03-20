@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import java.awt.Color
 import java.awt.Font
 import java.awt.font.TextAttribute
+import java.net.URI
 import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.io.path.inputStream
@@ -108,7 +109,7 @@ private class NewImageGen(
 
         private fun getSkin(uuid: String) =
             try {
-                val img = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/full"))
+                val img = ImageIO.read(URI("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/full").toURL())
                 ImmutableImage.wrapAwt(img)
             } catch (e: Exception) {
                 logger.error(e){ "Failed to load skin for $uuid, using default"}

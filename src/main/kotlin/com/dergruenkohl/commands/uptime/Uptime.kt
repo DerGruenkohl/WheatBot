@@ -8,11 +8,9 @@ import com.dergruenkohl.utils.hypixelutils.getFarmingUptime
 import com.sksamuel.scrimage.nio.PngWriter
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
-import io.github.freya022.botcommands.api.commands.application.slash.annotations.TopLevelSlashCommandData
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.utils.FileUpload
@@ -27,12 +25,10 @@ import org.jetbrains.kotlinx.kandy.letsplot.style.Theme
 import org.jetbrains.kotlinx.kandy.letsplot.x
 import org.jetbrains.kotlinx.kandy.letsplot.y
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import java.io.ByteArrayOutputStream
-import java.io.File
-import javax.imageio.ImageIO
+
 
 @Command
-object Uptime: ApplicationCommand() {
+object Uptime {
     private val logger = KotlinLogging.logger {}
     private val writer = PngWriter()
 

@@ -5,7 +5,6 @@ import com.dergruenkohl.utils.database.GuildRepo
 import com.dergruenkohl.utils.database.LbHistoryEntity
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
-import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.getUsernames
 import dev.freya02.botcommands.jda.ktx.components.TextInput
 import dev.freya02.botcommands.jda.ktx.components.row
@@ -13,7 +12,6 @@ import dev.freya02.botcommands.jda.ktx.coroutines.await
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import dev.freya02.jda.emojis.unicode.Emojis
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -45,7 +43,7 @@ import org.jetbrains.kotlinx.kandy.util.color.Color
 import kotlin.time.Duration.Companion.minutes
 
 @Command
-class UptimeLB(private val buttons: Buttons, private val modals: Modals): ApplicationCommand() {
+class UptimeLB(private val buttons: Buttons, private val modals: Modals) {
     private val logger = KotlinLogging.logger {  }
 
     @JDASlashCommand("uptimelb", description = "View the uptime leaderboard")

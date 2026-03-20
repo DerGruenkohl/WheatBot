@@ -8,7 +8,7 @@ import com.dergruenkohl.utils.getMinecraftUsername
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.CommandPath
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
+import io.github.freya022.botcommands.api.commands.application.SlashOptionChoiceProvider
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -23,7 +23,7 @@ import java.time.LocalDate
 typealias Choice = net.dv8tion.jda.api.interactions.commands.Command.Choice
 
 @Command
-object DataCommand : ApplicationCommand() {
+object DataCommand: SlashOptionChoiceProvider {
     val logger = KotlinLogging.logger {  }
     override fun getOptionChoices(
         guild: Guild?,
@@ -90,7 +90,7 @@ object DataCommand : ApplicationCommand() {
             )
         }
 
-        return super.getOptionChoices(guild, commandPath, optionName)
+        return emptyList()
     }
 
 

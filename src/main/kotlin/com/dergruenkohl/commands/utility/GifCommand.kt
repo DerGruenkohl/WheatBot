@@ -3,11 +3,11 @@ package com.dergruenkohl.commands.utility
 import com.dergruenkohl.utils.isImageUrl
 import com.dergruenkohl.utils.upload
 import com.sksamuel.scrimage.ImmutableImage
+import com.sksamuel.scrimage.metadata.ImageMetadata
 import com.sksamuel.scrimage.nio.StreamingGifWriter
 import com.sksamuel.scrimage.webp.WebpWriter
 import dev.freya02.botcommands.jda.ktx.components.Container
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -22,10 +22,17 @@ import java.io.File
 import java.net.URI
 import java.time.Duration
 import java.util.UUID
+import kotlin.math.roundToInt
 
 
 @Command
-class GifCommand: ApplicationCommand() {
+class GifCommand {
+    companion object {
+        private const val MAX_LANDSCAPE_WIDTH = 1920
+        private const val MAX_LANDSCAPE_HEIGHT = 1080
+        private const val MAX_GIF_FPS = 15.0
+    }
+
     private val logger = KotlinLogging.logger {  }
     @JDASlashCommand("gif", description = "create a gif from any image/video file")
     suspend fun createGif(event: GlobalSlashEvent,
@@ -67,7 +74,7 @@ class GifCommand: ApplicationCommand() {
             } else {
                 convertVideoWithRecoder(fileurl, stream, progressCallback)
             }
-
+            logger.info { "Stream size: ${stream.size()/1000/1000} MB" }
 
             val fileUpload = FileUpload.fromData(stream.toByteArray(), "meow.gif")
             val container = Container{
@@ -101,51 +108,122 @@ class GifCommand: ApplicationCommand() {
         }
         val file = File("images/temp/${UUID.randomUUID()}.gif")
         file.createNewFile()
+        var grabber: FFmpegFrameGrabber? = null
+        var recorder: FFmpegFrameRecorder? = null
+        var scaleFilter: FFmpegFrameFilter? = null
+        var firstRecordedFrame: Frame? = null
         try {
-            val grabber = FFmpegFrameGrabber(URI(url).toURL())
+            grabber = FFmpegFrameGrabber(URI(url).toURL())
             grabber.start()
-            val recorder = FFmpegFrameRecorder.createDefault(file, grabber.imageWidth, grabber.imageHeight)
-            recorder.pixelFormat = avutil.AV_PIX_FMT_RGB8
-            recorder.frameRate = grabber.frameRate // Match input frame rate
-            recorder.start()
-            val totalFramesToExtract = (grabber.lengthInFrames).coerceAtLeast(1)
-            var extractedFrames = 0
-            var lastProgress = 0
-            logger.info { "input framerate: ${grabber.frameRate}" }
-            logger.info { "input frames: ${grabber.lengthInFrames}" }
+            val activeGrabber = grabber
+            val (targetWidth, targetHeight) = calculateTargetDimensions(activeGrabber.imageWidth, activeGrabber.imageHeight)
+            logger.info { "input resolution: ${activeGrabber.imageWidth}x${activeGrabber.imageHeight}, output resolution: ${targetWidth}x${targetHeight}" }
+            val sourceFps = activeGrabber.frameRate.takeIf { it > 0.0 } ?: 24.0
+            val targetFps = minOf(sourceFps, MAX_GIF_FPS)
+            val frameStep = kotlin.math.ceil(sourceFps / targetFps).toInt().coerceAtLeast(1)
 
-            var frame = grabber.grabFrame(false, true, true, false)
-            val firstFrame = frame.clone()
+            if (targetWidth != activeGrabber.imageWidth || targetHeight != activeGrabber.imageHeight) {
+                scaleFilter = FFmpegFrameFilter("scale=$targetWidth:$targetHeight:flags=lanczos", targetWidth, targetHeight)
+                scaleFilter.start()
+            }
+
+            recorder = FFmpegFrameRecorder.createDefault(file, targetWidth, targetHeight)
+            recorder.format = "gif"
+            recorder.pixelFormat = avutil.AV_PIX_FMT_RGB8
+            recorder.frameRate = targetFps
+            recorder.setVideoOption("gifflags", "+transdiff")
+            recorder.start()
+            val totalFramesToExtract = (activeGrabber.lengthInFrames).coerceAtLeast(1)
+            var processedFrames = 0
+            var recordedFrames = 0
+            var lastProgress = 0
+            logger.info { "input framerate: $sourceFps, output framerate: $targetFps, frame step: $frameStep" }
+            logger.info { "input frames: ${activeGrabber.lengthInFrames}" }
+
+            var frame = activeGrabber.grabFrame(false, true, true, false)
             while (frame != null) {
-                recorder.record(frame)
-                frame = grabber.grabFrame(false, true, true, false)
-                extractedFrames++
-                // Update progress every 5%
-                val progress = (extractedFrames * 100) / totalFramesToExtract
+                if (processedFrames % frameStep == 0 && scaleFilter != null) {
+                    scaleFilter.push(frame)
+                    var filteredFrame = scaleFilter.pullImage()
+                    while (filteredFrame != null) {
+                        if (firstRecordedFrame == null) {
+                            firstRecordedFrame = filteredFrame.clone()
+                        }
+                        recorder.record(filteredFrame)
+                        recordedFrames++
+
+                        filteredFrame = scaleFilter.pullImage()
+                    }
+                } else if (processedFrames % frameStep == 0 && frame.image != null) {
+                    if (firstRecordedFrame == null) {
+                        firstRecordedFrame = frame.clone()
+                    }
+                    recorder.record(frame)
+                    recordedFrames++
+                }
+
+                processedFrames++
+                val progress = (processedFrames * 100) / totalFramesToExtract
                 if (progress != lastProgress && progress % 5 == 0) {
                     progressCallback(progress.coerceIn(1..100))
                     lastProgress = progress
                 }
+
+                frame = activeGrabber.grabFrame(false, true, true, false)
             }
-            logger.info { "Extracted frames: $extractedFrames" }
-            if (extractedFrames == 1){
-                recorder.record(firstFrame)
+            logger.info { "Processed frames: $processedFrames, recorded frames: $recordedFrames" }
+            if (recordedFrames == 1){
+                firstRecordedFrame?.let(recorder::record)
             }
             progressCallback(100)
             recorder.stop()
-            grabber.stop()
-            grabber.release()
             recorder.release()
-            firstFrame.close()
-            val inputStream = file.inputStream()
-            inputStream.copyTo(stream)
-            inputStream.close()
-            file.delete()
+            recorder = null
+            scaleFilter?.stop()
+            scaleFilter?.release()
+            scaleFilter = null
+            activeGrabber.stop()
+            activeGrabber.release()
+            grabber = null
+            file.inputStream().use { inputStream ->
+                inputStream.copyTo(stream)
+            }
+            logger.info { "Output gif size: ${file.length() / 1024 / 1024} MB" }
         } catch (e: Exception) {
             logger.error(e) { "Error while converting" }
-            file.delete()
             throw e
+        } finally {
+            firstRecordedFrame?.close()
+            runCatching { scaleFilter?.stop() }
+            runCatching { scaleFilter?.release() }
+            runCatching { recorder?.stop() }
+            runCatching { recorder?.release() }
+            runCatching { grabber?.stop() }
+            runCatching { grabber?.release() }
+            file.delete()
         }
+    }
+
+    private fun calculateTargetDimensions(width: Int, height: Int): Pair<Int, Int> {
+        val safeWidth = width.coerceAtLeast(1)
+        val safeHeight = height.coerceAtLeast(1)
+        val (maxWidth, maxHeight) = if (safeWidth >= safeHeight) {
+            MAX_LANDSCAPE_WIDTH to MAX_LANDSCAPE_HEIGHT
+        } else {
+            MAX_LANDSCAPE_HEIGHT to MAX_LANDSCAPE_WIDTH
+        }
+
+        val scaleFactor = minOf(
+            1.0,
+            maxWidth.toDouble() / safeWidth,
+            maxHeight.toDouble() / safeHeight,
+        )
+
+        return (
+            safeWidth * scaleFactor
+        ).roundToInt().coerceAtLeast(1) to (
+            safeHeight * scaleFactor
+        ).roundToInt().coerceAtLeast(1)
     }
 
 
@@ -198,6 +276,8 @@ class GifCommand: ApplicationCommand() {
     fun convertImage(url: String, stream: OutputStream) {
         val image = ImmutableImage.loader().fromUrl(URI(url).toURL())
         val writer = WebpWriter.DEFAULT.withLossless()
+        val metadata = ImageMetadata.fromImage(image)
+        logger.info { "metadata: $metadata" }
         writer.write(image, image.metadata, stream)
     }
 

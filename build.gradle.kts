@@ -24,7 +24,7 @@ dependencies {
     implementation(libs.bundles.kandy)
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.misc)
-    implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
+    implementation("org.bytedeco:ffmpeg-platform:8.0.1-1.5.13")
 }
 
 tasks.test {

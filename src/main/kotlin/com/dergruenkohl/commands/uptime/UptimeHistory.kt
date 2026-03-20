@@ -9,7 +9,6 @@ import com.dergruenkohl.utils.getMinecraftUsername
 import com.dergruenkohl.utils.hypixelutils.Time
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -29,7 +28,7 @@ import java.time.LocalDate
 import kotlin.time.measureTime
 
 @Command
-object UptimeHistory: ApplicationCommand() {
+object UptimeHistory {
     private val logger = KotlinLogging.logger {  }
     @JDASlashCommand(name = "uptimehistory", description = "Get the uptime history of a player")
     suspend fun onUptimeHistory(

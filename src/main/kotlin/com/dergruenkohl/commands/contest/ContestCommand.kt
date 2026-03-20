@@ -3,7 +3,6 @@ package com.dergruenkohl.commands.contest
 import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.getMinecraftUUID
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -11,7 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import java.awt.Color
 
 @Command
-object ContestCommand: ApplicationCommand() {
+object ContestCommand {
     @JDASlashCommand(name = "contests", description = "Get a contest graph for a user")
     suspend fun onContest(event: GlobalSlashEvent, @SlashOption("ign") ign: String) {
         try {

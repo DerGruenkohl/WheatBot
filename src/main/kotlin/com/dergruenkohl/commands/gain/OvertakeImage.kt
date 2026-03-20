@@ -8,7 +8,9 @@ import com.sksamuel.scrimage.canvas.drawables.FilledRect
 import com.sksamuel.scrimage.canvas.drawables.Text
 import dev.freya02.botcommands.jda.ktx.messages.Embed
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.*
 import java.awt.font.TextAttribute
@@ -18,6 +20,7 @@ import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.URI
 import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
@@ -63,7 +66,7 @@ class OvertakeImage(private val graph: OutgoingGraph) {
 
         private fun getSkin(uuid: String) =
             try {
-                val img = ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/face"))
+                val img = ImageIO.read(URI("https://starlightskins.lunareclipse.studio/render/isometric/${uuid}/face").toURL())
                 ImmutableImage.wrapAwt(img)
             } catch (e: Exception) {
                 steve1
@@ -286,8 +289,12 @@ class OvertakeImage(private val graph: OutgoingGraph) {
         var head2 = BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB)
         //read the heads
         try {
-            head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p1.uuid}/face") )
-            head2 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p2.uuid}/face"))
+            head1 = withContext(Dispatchers.IO) {
+                ImageIO.read(URI("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p1.uuid}/face").toURL())
+            }
+            head2 = withContext(Dispatchers.IO) {
+                ImageIO.read(URI("https://starlightskins.lunareclipse.studio/render/isometric/${graph.p2.uuid}/face").toURL())
+            }
 
             // Flip the image horizontally
             val tx = AffineTransform.getScaleInstance(-1.0, 1.0)

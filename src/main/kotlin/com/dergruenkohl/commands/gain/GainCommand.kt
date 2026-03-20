@@ -7,7 +7,7 @@ import com.dergruenkohl.utils.getMinecraftUUID
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.CommandPath
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
+import io.github.freya022.botcommands.api.commands.application.SlashOptionChoiceProvider
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -21,7 +21,7 @@ import javax.imageio.ImageIO
 
 
 @Command
-object GainCommand: ApplicationCommand() {
+object GainCommand: SlashOptionChoiceProvider {
     override fun getOptionChoices(
         guild: Guild?,
         commandPath: CommandPath,
@@ -70,7 +70,7 @@ object GainCommand: ApplicationCommand() {
                 )
         }
 
-        return super.getOptionChoices(guild, commandPath, optionName)
+        return emptyList()
     }
     private val logger = KotlinLogging.logger {  }
 

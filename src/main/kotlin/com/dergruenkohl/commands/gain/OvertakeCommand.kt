@@ -3,12 +3,11 @@ package com.dergruenkohl.commands.gain
 import com.dergruenkohl.utils.ErrorHandler
 import com.dergruenkohl.utils.getLoading
 import com.dergruenkohl.utils.getMinecraftUUID
-import com.dergruenkohl.utils.getMinecraftUsername
 import com.sksamuel.scrimage.nio.PngWriter
 import dev.freya02.botcommands.jda.ktx.coroutines.await
 import io.github.freya022.botcommands.api.commands.CommandPath
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
+import io.github.freya022.botcommands.api.commands.application.SlashOptionChoiceProvider
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
@@ -16,13 +15,11 @@ import io.github.freya022.botcommands.api.commands.application.slash.annotations
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.utils.FileUpload
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 
 typealias Choice = net.dv8tion.jda.api.interactions.commands.Command.Choice
 
 @Command
-object OvertakeCommand : ApplicationCommand() {
+object OvertakeCommand: SlashOptionChoiceProvider {
     override fun getOptionChoices(
         guild: Guild?,
         commandPath: CommandPath,
@@ -71,7 +68,7 @@ object OvertakeCommand : ApplicationCommand() {
                 )
         }
 
-        return super.getOptionChoices(guild, commandPath, optionName)
+        return emptyList()
     }
     private val logger = KotlinLogging.logger {  }
     private val writer = PngWriter()

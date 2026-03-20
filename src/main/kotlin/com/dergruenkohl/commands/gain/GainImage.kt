@@ -3,6 +3,8 @@ package com.dergruenkohl.commands.gain
 import com.dergruenkohl.config.Data
 import com.dergruenkohl.utils.getMinecraftUsername
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.*
@@ -12,6 +14,7 @@ import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.URI
 import java.net.URL
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
@@ -105,7 +108,9 @@ class GainImage(private val gain: GraphPlayer, private val goal: Long) {
 
         try {
             //read the heads
-            var head1 =ImageIO.read(URL("https://starlightskins.lunareclipse.studio/render/isometric/${gain.uuid}/full"))
+            var head1 = withContext(Dispatchers.IO) {
+                ImageIO.read(URI("https://starlightskins.lunareclipse.studio/render/isometric/${gain.uuid}/full").toURL())
+            }
             // scale and draw the heads
             head1 = scaleImage(head1)
 

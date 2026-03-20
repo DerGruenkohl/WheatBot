@@ -5,15 +5,12 @@ import com.dergruenkohl.hypixel.client.getGuildById
 import com.dergruenkohl.hypixel.client.getGuildByName
 import com.dergruenkohl.utils.database.GuildRepo.save
 import io.github.freya022.botcommands.api.commands.annotations.Command
-import io.github.freya022.botcommands.api.commands.application.ApplicationCommand
 import io.github.freya022.botcommands.api.commands.application.slash.GlobalSlashEvent
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.JDASlashCommand
 import io.github.freya022.botcommands.api.commands.application.slash.annotations.SlashOption
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
 
 @Command
-class AddGuild: ApplicationCommand() {
+class AddGuild {
     @JDASlashCommand(name = "addguild", description = "Add a guild to the database")
     suspend fun addGuild(event: GlobalSlashEvent, @SlashOption(description = "Guild name") guild: String?, @SlashOption(description = "Guild ID") guildId: String?) {
         try {
